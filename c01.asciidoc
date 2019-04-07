@@ -26,32 +26,60 @@
 * 名前を付けて保存
 * 実行 (run->run module)
 
-////
 .hello.py
 [source,python]
 ----
 print("Hello world!")
 ----
-////
 
+////
 .hello.py
 [source,python]
 ----
 include::sources/hello.py[lines=1..1]
 ----
+////
+
 
 ==== セルシアス度とファーレンハイト度
 
 
-==== 課題
-FizzBuzzは，ひとりずつ１から順に数を数えていってて，3で割り切れる場合は数ではなく「Fizz」，5で割り切れる場合は「Buzz」、両者で割り切れる場合は「Fizz Buzz」と言うゲームである．これを，50までの数に対して行うプログラムをつくろう．
+=== 課題
+FizzBuzzは，ひとりずつ１から順に数を数えていって，3で割り切れる場合は数ではなく「Fizz」，5で割り切れる場合は「Buzz」、両者で割り切れる場合は「Fizz Buzz」と言うゲームである．これを，50までの数に対して行うプログラムをつくろう．
 
-==== 発展課題
+=== 発展課題
 下のプログラムを入力して動かしてみよう．
 ソースコードを読んで，何をしているか考えてみよう．
 
 .guess.py
 [source,python]
 ----
+# これは数あてゲームです
+import random
+
+number = random.randint(1, 20)
+
+print('この数は，1から20までの整数です')
+
+for i in range(5):
+    print('数をあててみて？')
+    guess = input()
+    guess = int(guess)
+
+    if guess < number:
+        print('小さすぎ')
+    elif guess > number:
+        print('大きすぎ')
+    else:
+        break
+
+if guess == number:
+    print('あたり！ トライした回数は' + str(i+1) + '回でした')
+else:
+    print('残念: 答えは' + str(number) + 'でした')
+----
+////
+----
 include::sources/guess.py[]
 ----
+////
