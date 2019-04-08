@@ -1,16 +1,16 @@
 # a, b, c どれが一番大きい？
 print("a?")
-a = input()
+a = int(input())
 print("b?")
-b = input()
+b = int(input())
 print("c?")
-c = input()
+c = int(input())
 
 if a > b:
     if a > c:
         print(a)
     else:
-        print(c)
+        print(c)       
 else:
     if b > c:
         print(b)
