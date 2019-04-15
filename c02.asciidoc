@@ -3,11 +3,13 @@
 === いろいろなif
 `if-elif-elif-...-else`
 
+////
 .abc2.py
 [source,python]
 ----
 include::sources/abc2.py[lines=1..]
 ----
+////
 
 .abc2.py
 [source,python]
@@ -51,11 +53,13 @@ while構造で，くりかえしを実現．
 条件がなりたつまで，ループを繰り返す．
 以下は，数あてゲームの単純版．
 
+////
 .guess2.py
 [source,python]
 ----
 include::sources/guess2.py[lines=1..]
 ----
+////
 
 .guess2.py
 [source,python]
@@ -77,11 +81,13 @@ print('あたり！')
 
 何のプログラム？動かしてみよう．
 
+////
 .euclidean.py
 [source,python]
 ----
 include::sources/euclidean.py[lines=1..]
 ----
+////
 
 .euclidean.py
 [source,python]
@@ -102,11 +108,14 @@ print(b)
 ==== じゃんけん
 
 じゃんけんのプログラム．
+
+////
 .jankenn.py
 [source,python]
 ----
 include::sources/janken.py[lines=1..]
 ----
+////
 
 .jankenn.py
 [source,python]
