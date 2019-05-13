@@ -63,12 +63,3 @@ while is_correct(secret, inputLetters) == False:
         if life <= 0:
              break
     st = st_next
-
-'''
-show_life(2)
-for i in range(0, 10):
-    print(get_word())
-print(unmask_word("hogehoge", "abcdeo"))
-
-print(input_letter())
-'''
