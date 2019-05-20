@@ -67,7 +67,7 @@ https://www.cle.osaka-u.ac.jp/webapps/blackboard/content/listContentEditable.jsp
 （もしくは，別途とってくる．）
 
 === 課題
-`02_jump_game.py` か `06_click_game.py` を少し改変してみる．
+`02_jump_game.py` か `06_click_game.py` のいずれかを少し改変してみる．
 2週にかけて行い，次週の最後にファイルを提出するとともに，どのように
 改変したかを数行で説明する．
 
