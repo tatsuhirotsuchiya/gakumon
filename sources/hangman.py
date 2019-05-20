@@ -37,16 +37,6 @@ def input_letter():
                 break
     return st
 
-
-inputLetters = ""
-secret = get_word()
-st = unmask_word(secret, inputLetters)
-print(st)
-while is_correct(secret, inputLetters) == False:
-    inputLetters = inputLetters + input_letter()
-    st = unmask_word(secret, inputLetters)
-    print(st)
-
 life = 5
 inputLetters = ""
 secret = get_word()
