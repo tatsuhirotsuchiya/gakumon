@@ -75,3 +75,14 @@ https://www.cle.osaka-u.ac.jp/webapps/blackboard/content/listContentEditable.jsp
 まず，プログラムを見てみて，だいたい何をやっているか，検討をつけよう．
 
 そうすれば，ジャンプの高さや，円の大きさなどを，変更することができるはず．
+
+////
+==== pyxeleditor
+
+pyxeleditorを使えば，キャラクタの画像などを変更できる．
+（注．大学の環境だと非常に遅い．）
+
+たとえば，`02_jump_game.py` なら，`assets` の下の `jump_game.pyxel` にデータが入っている．
+`assets` のフォルダに行って，トップレベルからのフォルダの場所が表示されている部分に，`powershell` と打ち込んだうえで，
+`pyxeleditor jum_game.pyxel` を実行すれば，このファイルを編集できる．
+////

@@ -1,0 +1,276 @@
+= 学問への扉：計算機プログラミング入門
+
+== Pyxelをつかったプログラミング
+=== 課題 (再掲)
+`02_jump_game.py` か `06_click_game.py` のいずれかを少し改変してみる．
+2週にかけて行い，次週の最後にファイルを提出するとともに，どのように
+改変したかを数行で説明する．
+
+処理をすべて把握することは，必要でない．
+まず，プログラムを見てみて，だいたい何をやっているか，検討をつけよう．
+
+そうすれば，ジャンプの高さや，円の大きさなどを，変更することができるはず．
+
+=== おすすめ資料
+https://cpp-learning.com/pyxel_day1/[Pythonでレトロゲームを作ろう!]
+
+特に，座標の考え方は重要なのでよんでおこう．
+
+=== プログラム解説
+
+.02_jump_game.py
+[source,python]
+----
+from random import randint #<1>
+
+import pyxel #<2>
+----
+<1> `randint` モジュールの `random` 関数を導入
+<2> `pyxel` モジュールを導入
+
+次は，初期設定．
+
+[source,python]
+----
+class App:
+    def __init__(self):
+        pyxel.init(160, 120, caption="Pyxel Jump") #<1>
+
+        pyxel.load("assets/jump_game.pyxel") #<2>
+
+        self.score = 0 #<3>
+        self.player_x = 72
+        self.player_y = -16
+        self.player_vy = 0
+        self.player_is_alive = True
+
+        self.far_cloud = [(-10, 75), (40, 65), (90, 60)]
+        self.near_cloud = [(10, 25), (70, 35), (120, 15)]
+        self.floor = [(i * 60, randint(8, 104), True) for i in range(4)]
+        self.fruit = [(i * 60, randint(0, 104), randint(0, 2), True) for i in range(4)]
+
+        pyxel.playm(0, loop=True) #<4>
+
+        pyxel.run(self.update, self.draw) #<5>
+----
+<1> 画面設定
+<2> キャラクターの画像や音楽の情報を指定されたファイルから読み込み
+<3> 各種変数の設定 `self.` をつけることで，クラス内のどのメソッド（関数みたいなもの）からアクセスできるようにする．（正確にいうと，インスタンス変数をつくっている）
+<4> 音楽の設定
+<5> ゲームの中身（どのように情報を更新するか，どのように画面を描画するか）を指定して，ゲームを実行
+
+
+キャラクターの画像や音楽の情報は，`pyxeleditor` というツールを使って確認できる．
+`cmd` , `powershell` ，ターミナルから
+----
+> pyxeleditor .\jump_game.pyxel
+----
+
+ゲームはステップを1秒間に何度も繰り返すことで進行する．
+`update()` で，毎ステップでどのようにキャラなどの情報を更新するかを決める．
+
+[source,python]
+----
+    def update(self):
+        if pyxel.btnp(pyxel.KEY_Q):
+            pyxel.quit()
+
+        self.update_player() #<1>
+
+        for i, v in enumerate(self.floor): #<2>
+            self.floor[i] = self.update_floor(*v)
+
+        for i, v in enumerate(self.fruit): #<3>
+            self.fruit[i] = self.update_fruit(*v)
+----
+<1> プレイヤーの更新
+<2> ゆかの更新
+<3> フルーツの更新
+
+2の `for` は，以下の様に書くのと同じ
+----
+for i in range(len(self.floor)):
+    x, y, is_active = self.floor[i]
+    self.floor[i] = self.update_floor(x, y, is_active)
+----
+
+
+[source,python]
+----
+    def update_player(self):
+        if pyxel.btn(pyxel.KEY_LEFT) or pyxel.btn(pyxel.GAMEPAD_1_LEFT): #<1>
+            self.player_x = max(self.player_x - 2, 0)
+
+        if pyxel.btn(pyxel.KEY_RIGHT) or pyxel.btn(pyxel.GAMEPAD_1_RIGHT):
+            self.player_x = min(self.player_x + 2, pyxel.width - 16)
+
+        self.player_y += self.player_vy #<2>
+        self.player_vy = min(self.player_vy + 1, 8)
+
+        if self.player_y > pyxel.height: #<3>
+            if self.player_is_alive:
+                self.player_is_alive = False
+                pyxel.play(3, 5)
+
+            if self.player_y > 600:
+                self.score = 0
+                self.player_x = 72
+                self.player_y = -16
+                self.player_vy = 0
+                self.player_is_alive = True
+----
+<1> キーボードの入力で左に移動
+<2> 落下
+<3> 死亡
+
+[source,python]
+----
+    def update_floor(self, x, y, is_active):
+        if is_active:
+            if (
+                self.player_x + 16 >= x
+                and self.player_x <= x + 40
+                and self.player_y + 16 >= y
+                and self.player_y <= y + 8
+                and self.player_vy > 0
+            ): #<1>
+                is_active = False
+                self.score += 10
+                self.player_vy = -12
+                pyxel.play(3, 3)
+        else:
+            y += 6
+
+        x -= 4
+
+        if x < -40: #<2>
+            x += 240
+            y = randint(8, 104)
+            is_active = True
+
+        return (x, y, is_active) #<3>
+----
+<1> 床にあたって，ジャンプした場合
+<2> 左端に消えた場合
+<3> 新しい位置等をタプルとして返す
+
+[source,python]
+----
+    def update_fruit(self, x, y, kind, is_active):
+        if is_active and abs(x - self.player_x) < 12 and abs(y - self.player_y) < 12: #<1>
+            is_active = False
+            self.score += (kind + 1) * 100
+            self.player_vy = min(self.player_vy, -8)
+            pyxel.play(3, 4)
+
+        x -= 2
+
+        if x < -40: #<2>
+            x += 240
+            y = randint(0, 104)
+            kind = randint(0, 2)
+            is_active = True
+
+        return (x, y, kind, is_active) #<3>
+----
+<1> フルーツゲット
+<2> 左端に消えた場合
+<3> 新しい位置等をタプルとして返す
+
+`draw()` は，ステップ毎に，画面をどのように更新するかを決める．
+
+[source,python]
+----
+    def draw(self):
+        pyxel.cls(12) #<1>
+
+        # draw sky
+        pyxel.blt(0, 88, 0, 0, 88, 160, 32) #<2>
+
+        # draw mountain
+        pyxel.blt(0, 88, 0, 0, 64, 160, 24, 12)
+----
+<1> 画面を色12でクリア
+<2> イメージバンクから，指定分をとってくる．
+イメージバンクは，pyxelで使う画像が格納されている256x256ピクセルの領域．
+キャラクターの画像は，イメージバンクの領域を切り出して表示する．
+
+[quote,https://github.com/kitao/pyxel/blob/master/README.ja.md]
+____
+`blt(x, y, img, u, v, w, h, [colkey])`
+
+イメージバンク`img`(0-2) の (`u`, `v`) からサイズ (`w`, `h`) の領域を (`x`, `y`) にコピーする。`w`、 `h` それぞれに負の値を設定すると水平、垂直方向に反転する。 `colkey` に色を指定すると透明色として扱われる
+____
+
+[source,python]
+----
+        # draw forest
+        offset = pyxel.frame_count % 160
+        for i in range(2):
+            pyxel.blt(i * 160 - offset, 104, 0, 0, 48, 160, 16, 12)
+
+        # draw clouds
+        offset = (pyxel.frame_count // 16) % 160
+        for i in range(2):
+            for x, y in self.far_cloud:
+                pyxel.blt(x + i * 160 - offset, y, 0, 64, 32, 32, 8, 12)
+
+        offset = (pyxel.frame_count // 8) % 160
+        for i in range(2):
+            for x, y in self.near_cloud:
+                pyxel.blt(x + i * 160 - offset, y, 0, 0, 32, 56, 8, 12)
+
+        # draw floors
+        for x, y, is_active in self.floor:
+            pyxel.blt(x, y, 0, 0, 16, 40, 8, 12)
+
+        # draw fruits
+        for x, y, kind, is_active in self.fruit:
+            if is_active:
+                pyxel.blt(x, y, 0, 32 + kind * 16, 0, 16, 16, 12)
+
+        # draw player
+        pyxel.blt(
+            self.player_x,
+            self.player_y,
+            0,
+            16 if self.player_vy > 0 else 0,
+            0,
+            16,
+            16,
+            12,
+        )
+
+        # draw score
+        s = "SCORE {:>4}".format(self.score)
+        pyxel.text(5, 4, s, 1)
+        pyxel.text(4, 4, s, 7)
+#<1>
+
+App() #<2>
+----
+<1> クラス `App` 定義おわり
+<2> クラス `App` のインスタンス(データをもった実体のこと)をつくる．
+そのとき，`\__init__()` が自動的に実行され，ゲームが起動される．
+
+=== 課題
+
+CLEから以下を提出．
+どのような変更をおこなったか（200字くらい）を回答し，
+スクリーンショットを添付．
+
+== 次回以降
+
+自分のプログラムをつくる．ゲームでなくてもよいが，pyxelは使うこと．
+
+
+////
+==== pyxeleditor
+
+pyxeleditorを使えば，キャラクタの画像などを変更できる．
+（注．大学の環境だと非常に遅い．）
+
+たとえば，`02_jump_game.py` なら，`assets` の下の `jump_game.pyxel` にデータが入っている．
+`assets` のフォルダに行って，トップレベルからのフォルダの場所が表示されている部分に，`powershell` と打ち込んだうえで，
+`pyxeleditor jum_game.pyxel` を実行すれば，このファイルを編集できる．
+////
