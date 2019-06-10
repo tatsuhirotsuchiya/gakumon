@@ -62,6 +62,52 @@ pyxel.run(update, draw)
 
 == プログラム例その2 シューティングゲームをつくってみる
 
+まず，自分を設定．
+`class` は新たなデータの種類をつくるようなイメージ．
+`Plane` で自分の飛行機をつくる．
+データとしては，今は，x座標とy座標をもっているだけ．
+`update()` という関数（専門的にはメソッド）に，
+データに対する操作を記述している．
+ここでは，キーにしたがって左右に動く．
+
+.meteo01.py
+[source,python]
+----
+import random
+import pyxel
+
+SCREEN_WIDTH = 200
+SCREEN_HEIGHT = 255
+
+class Plane:
+    def __init__(self):
+        self.x = SCREEN_WIDTH /2
+        self.y = SCREEN_HEIGHT * 0.8
+    def update(self):
+        if pyxel.btn(pyxel.KEY_LEFT):
+            self.x = max(self.x - 4, 0)
+        if pyxel.btn(pyxel.KEY_RIGHT):
+            self.x = min(self.x + 4, pyxel.width)
+
+plane = Plane()
+
+def update():
+    global plane
+
+    if pyxel.btnp(pyxel.KEY_Q):
+        pyxel.quit()
+    plane.update()
+
+def draw():
+    global plane
+    pyxel.cls(0)
+    pyxel.circ(plane.x, plane.y, 5, 4)
+
+pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Hello Pyxel", scale=4, fps=30)
+pyxel.run(update, draw)
+----
+
+
 とりあえずできたところまで．
 
 .meteo1.py
