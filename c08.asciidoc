@@ -287,6 +287,104 @@ pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Hello Pyxel", scale=4, fps=30)
 pyxel.run(update, draw)
 ----
 
+あたり判定をくわえれば，ひとまずゲームにはなる．
+とりあえず，ぶつかったら，無理やり初期設定に戻るようにしておく．
+
+----
+for met in meteos:
+    if -10 < (met.y - plane.y) < 10:
+        if -10 < (met.x - plane.x) < 10:
+            is_running = False
+            meteos = []
+            plane = Plane()
+----
+
+以下，今日の進捗分．
+
+.meteo2.py
+[source,python]
+----
+import random
+import pyxel
+
+SCREEN_WIDTH = 200
+SCREEN_HEIGHT = 255
+
+class Meteo:
+    def __init__(self):
+        self.x = random.randint(0, SCREEN_WIDTH)
+        self.y = -SCREEN_HEIGHT
+        self.is_dead = False
+
+    def update(self):
+        if self.is_dead == False:
+            self.y += 10
+            if self.y > SCREEN_HEIGHT:
+                self.is_dead = True
+
+class Plane:
+    def __init__(self):
+        self.x = SCREEN_WIDTH /2
+        self.y = SCREEN_HEIGHT * 0.8
+        self.is_dead = False
+    def update(self):
+        if pyxel.btn(pyxel.KEY_LEFT):
+            self.x = max(self.x - 4, 0)
+        if pyxel.btn(pyxel.KEY_RIGHT):
+            self.x = min(self.x + 4, pyxel.width)
+
+    #if self.is_dead == False:
+
+
+is_running = False
+meteos = []
+plane = Plane()
+
+def update():
+    global is_running
+    global meteos
+    global plane
+
+    if pyxel.btnp(pyxel.KEY_Q):
+        pyxel.quit()
+    if is_running == False:
+        if pyxel.btnp(pyxel.KEY_SPACE):
+            is_running = True
+        return
+
+    plane.update()
+
+    if random.uniform(0, 1.0) < 0.2:
+        meteos.append(Meteo())
+    for i in range(len(meteos)):
+        meteos[i].update()
+    for i in range(len(meteos)-1,-1,-1):
+        if meteos[i].is_dead == True:
+            del meteos[i]
+
+    for met in meteos:
+        if -10 < (met.y - plane.y) < 10:
+            if -10 < (met.x - plane.x) < 10:
+                is_running = False
+                meteos = []
+                plane = Plane()
+
+def draw():
+    global is_running
+    global meteos
+    global plane
+
+    pyxel.cls(0)
+    if is_running == False:
+        pyxel.text(5, SCREEN_HEIGHT/2, "Press the Space Key!", pyxel.frame_count % 16)
+    for met in meteos:
+        pyxel.circ(met.x, met.y, 5, 6)
+    pyxel.circ(plane.x, plane.y, 5, 4)
+
+pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Hello Pyxel", scale=4, fps=30)
+pyxel.run(update, draw)
+----
+
 
 ////
 ==== pyxeleditor
