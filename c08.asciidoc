@@ -107,8 +107,111 @@ pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Hello Pyxel", scale=4, fps=30)
 pyxel.run(update, draw)
 ----
 
+こんどは，隕石だけをつくってみる．こちらは少し複雑．
 
-とりあえずできたところまで．
+まず，隕石のクラスをつくる．座標と，生きているか死んでいるか（画面の外にでたか）という
+情報をもたせる．
+
+複数の隕石を管理するのに，リスト`meteos` をつかっている．
+最初はカラ．
+
+ランダムに出現させて，リストにくわえる．これは，`meteos.append(Meteo())` で実現．
+`Meteo()` で新しい隕石ができて，リスト`meteos` に加えられている．
+
+死んでいたら，リストから消去．これはリストの後ろから実行しないといけない．
+理由は，たとえば，１番目を消去して，２番目を消去すると，１番目を消去した段階で，
+２番目の隕石は１番目の隕石になっているので（繰り下がっている）うまくいかない．
+
+
+.meteo02.py
+[source,python]
+----
+import random
+import pyxel
+
+SCREEN_WIDTH = 200
+SCREEN_HEIGHT = 255
+
+class Meteo:
+    def __init__(self):
+        self.x = random.randint(0, SCREEN_WIDTH)
+        self.y = -SCREEN_HEIGHT
+        self.is_dead = False
+
+    def update(self):
+        if self.is_dead == False:
+            self.y += 10
+            if self.y > SCREEN_HEIGHT:
+                self.is_dead = True
+
+meteos = []
+
+def update():
+    global meteos
+
+    if pyxel.btnp(pyxel.KEY_Q):
+        pyxel.quit()
+
+    if random.uniform(0, 1.0) < 0.1:
+        meteos.append(Meteo())
+    for i in range(len(meteos)):
+        meteos[i].update()
+    for i in range(len(meteos)-1,-1,-1):
+        if meteos[i].is_dead == True:
+            del meteos[i]
+
+def draw():
+    global meteos
+
+    pyxel.cls(0)
+    for met in meteos:
+        pyxel.circ(met.x, met.y, 5, 6)
+
+pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Hello Pyxel", scale=4, fps=30)
+pyxel.run(update, draw)
+----
+
+あと，`is_running` という，`False` か `True` の変数をいれて，
+前者の場合はゲームがはじまっていないことを，後者は始まったことを示すようにする．
+`False` の場合は，スペースキーがおされるまで，「スペースキーをおせ」と表示するようにする．
+
+.meteo03.py
+[source,python]
+----
+import random
+import pyxel
+
+SCREEN_WIDTH = 200
+SCREEN_HEIGHT = 255
+
+is_running = False
+
+def update():
+    global is_running
+    global meteos
+    global plane
+
+    if pyxel.btnp(pyxel.KEY_Q):
+        pyxel.quit()
+    if is_running == False:
+        if pyxel.btnp(pyxel.KEY_SPACE):
+            is_running = True
+        return
+
+def draw():
+    global is_running
+
+    pyxel.cls(0)
+    if is_running == False:
+        pyxel.text(5, SCREEN_HEIGHT/2, "Press the Space Key!", pyxel.frame_count % 16)
+    else:  # このelse部分は要消去
+        pyxel.text(5, SCREEN_HEIGHT/2, "The game is being played", 5)
+
+pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Hello Pyxel", scale=4, fps=30)
+pyxel.run(update, draw)
+----
+
+これらをあわせて，とりあえずできたところまでが，以下のプログラム．
 
 .meteo1.py
 [source,python]
