@@ -14,10 +14,10 @@
 
 == プログラム例その2 続き
 
-スペースキーをおすと，ミサイルが発射されるようにした．
-隕石に当たったときの処理は，まだ書いていない．
+隕石とミサイルとの当たり判定を追加．
+あと，少しプログラムの書き方を整理．
 
-.meteo3.py
+.meteo4.py
 [source,python]
 ----
 import random
@@ -44,7 +44,6 @@ class Plane:
     def __init__(self):
         self.x = SCREEN_WIDTH/2
         self.y = SCREEN_HEIGHT * 0.8
-        self.is_dead = False
 
     def update(self):
         if pyxel.btn(pyxel.KEY_LEFT):
@@ -79,38 +78,58 @@ def update():
     global missiles
     global MAX_MISSILES
 
+    # Qで終了
     if pyxel.btnp(pyxel.KEY_Q):
         pyxel.quit()
+    # SPACEキーでスタート前．スタートする前はreturn
     if is_running is False:
         if pyxel.btnp(pyxel.KEY_SPACE):
             is_running = True
+            meteos = []
+            plane = Plane()
         return
 
+    # 飛行機動作
     plane.update()
 
+    # 隕石発生
     if random.uniform(0, 1.0) < 0.2:
         meteos.append(Meteo())
+    # 隕石動作
     for i in range(len(meteos)):
         meteos[i].update()
-    for i in range(len(meteos)-1, -1, -1):
-        if meteos[i].is_dead is True:
-            del meteos[i]
 
+    # ミサイル発射
+    if pyxel.btnp(pyxel.KEY_SPACE):
+        if len(missiles) < MAX_MISSILES:
+            missiles.append(Missile(plane.x, plane.y))
+    # ミサイル動作
+    for missile in missiles:
+        missile.update()
+
+    # 飛行機と隕石 当たり判定
     for met in meteos:
         if -10 < (met.y - plane.y) < 10:
             if -10 < (met.x - plane.x) < 10:
                 is_running = False
-                meteos = []
-                plane = Plane()
 
-    if pyxel.btnp(pyxel.KEY_SPACE):
-        if len(missiles) < MAX_MISSILES:
-            missiles.append(Missile(plane.x, plane.y))
+    # ミサイルと隕石 当たり判定
+    for met in meteos:
+        for miss in missiles:
+            if -10 < met.y - miss.y < 10:
+                if -10 < met.x - miss.x < 10:
+                    met.is_dead = True
+                    miss.is_dead = True
+
+    # 死んだ隕石をリストから削除
+    for i in range(len(meteos)-1, -1, -1):
+        if meteos[i].is_dead is True:
+            del meteos[i]
+
+    # 死んだミサイルをリストから削除
     for i in range(len(missiles)-1, -1, -1):
         if missiles[i].is_dead is True:
             del missiles[i]
-    for missile in missiles:
-        missile.update()
 
 
 def draw():
@@ -129,7 +148,7 @@ def draw():
 
     pyxel.circ(plane.x, plane.y, 5, 4)
 
-pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Hello Pyxel", scale=4)
+pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Shooting Star", scale=4)
 pyxel.run(update, draw)
 ----
 
