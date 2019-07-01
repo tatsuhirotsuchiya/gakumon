@@ -231,6 +231,10 @@ pyxel.init(160, 80)
 pyxel.run(update, draw)
 ----
 
+== プレゼンテーション資料の例
+
+https://github.com/tatsuhirotsuchiya/gakumon/raw/master/meteo.pptx[meteo4.pyについて説明したスライド]
+
 ////
 ==== pyxeleditor
 
