@@ -10,6 +10,12 @@
 8/5に5分程度で，パワーポイントをつかってプレゼンする．
 そのためのパワーポイント資料作成は，7/22から8/5までに実施．
 
+7/29は自主活動（普段作業している基礎工の部屋は使用不可能）．
+したがって，自分のPCを使っていないのなら，プログラム制作は7/22までに終わらせておく．
+
+作成した発表用の資料（パワーポイントなどのファイル）は，
+8/5正午までにCLEにアップロードすること．
+
 == 画像のさしかえ
 
 画像をさしかえる方法について解説する．
@@ -89,7 +95,7 @@ for bubble in self.bubbles:
 * 画像のイメージバンク上の左上の座標は，`(0, (int(bubble.r)-1)*8)`　
 `bubble.r` は半径だが，整数ではないので，`int()` をつかって整数にしている．
 
-* 取ってくる領域のおおきさは　`8` × `8` ピクセル．
+* 取ってくる領域のおおきさは `8` × `8` ピクセル．
 
 * 色0 (黒のこと)は，透けるようにしている（透明色）
 
@@ -98,3 +104,59 @@ for bubble in self.bubbles:
 * link:tmp\06_click_game.py[プログラム]
 
 * link:tmp\my_resource.pyxel[画像等のデータ]
+
+== pyxelエディタをつかわないで，画像を描く方法
+
+数字でピクセルの色を直接指定する．0～9, a, b, c, d, e, fで16色を表す．
+
+.plane.py
+[source,python]
+----
+import pyxel
+
+pyxel.init(100, 100)
+
+# 8x8のドット絵を描く
+# 0からfまでで15色を指定
+plane_dot = ["0006d000",
+             "0006d000",
+             "00688660",
+             "065586d0",
+             "d6c656dd",
+             "d6c65ddd",
+             "02665d20"]
+
+# 上で記述した画像を，イメージバンクにコピー
+# ここでは，画像の左上を，イメージバンクの座標(0,0)にあわせている
+pyxel.image(0).set(0, 0, plane_dot)
+
+# 飛行機のx座標
+plane_x = 50
+
+
+def update():
+    global plane_x
+    if pyxel.btnp(pyxel.KEY_Q):
+        pyxel.quit()
+    if pyxel.btn(pyxel.KEY_LEFT):
+        plane_x = max(plane_x - 4, 0)
+    elif pyxel.btn(pyxel.KEY_RIGHT):
+        plane_x = min(plane_x + 4, 92)
+
+
+def draw():
+    global plane_x
+    pyxel.cls(1)
+    # 飛行機を描写
+    pyxel.blt(plane_x, 85, 0, 0, 0, 8, 8, 0)
+
+pyxel.run(update, draw)
+----
+
+image::images/plane.png[画面,400]
+
+== プレゼン資料作成にむけて
+
+* サイバーメディアセンターでPowerpointをつかうのなら，スクリーンショットを自分宛にメールで送っておくとよい．
+
+* いまいるところ（基礎工G棟の実験室）でプレゼン資料をつくるのなら，たとえば，google slidesどを利用するとよい．
