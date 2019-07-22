@@ -24,7 +24,7 @@
 
 * スクリーンショットは, Alt+PrintScreenで撮影できる．そのあと，ペイントをたちあげて，張り付けて，保存すればよい．
 
-* いまいるところ（基礎工G棟の実験室）でプレゼン資料をつくるのなら，たとえば，google slidesどを利用するとよい．
+* いまいるところ（基礎工G棟の実験室）でプレゼン資料をつくるのなら，たとえば，google slidesなどを利用するとよい．
 
 * プレゼン資料（スライド）のサンプルは，
 https://github.com/tatsuhirotsuchiya/gakumon/blob/master/c11.asciidoc#%E3%83%97%E3%83%AC%E3%82%BC%E3%83%B3%E3%83%86%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E8%B3%87%E6%96%99%E3%81%AE%E4%BE%8B
