@@ -1,0 +1,210 @@
+= 学問への扉：計算機プログラミング入門
+
+== Pyxelをつかったプログラミング
+== 課題
+
+自分のプログラムをつくる．ゲームでなくてもよいが，pyxelは使うこと．
+
+7週くらいを使って，作成．最後に5分程度で，パワーポイントをつかってプレゼンする．
+そのためのパワーポイント資料作成に1週程度を見込むこと．
+
+0から新しいプログラムをつくるのは難しいかもしれない．
+
+既存のプログラムを改造することを考えると良いかもしれない．
+
+=== プログラム解説
+
+.06_jump_game.py
+[source,python]
+----
+import math
+import random
+
+import pyxel
+
+SCREEN_WIDTH = 255
+SCREEN_HEIGHT = 255
+
+BUBBLE_MAX_SPEED = 1.8
+BUBBLE_INITIAL_COUNT = 50
+BUBBLE_EXPLODE_COUNT = 11
+----
+必要なモジュールを導入．
+基本的な値を設定．
+
+[source,python]
+----
+class Vec2:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+----
+xとyの2つの値をもつような，データの種類を設定．
+
+各バブルの設定
+[source,python]
+----
+class Bubble:
+    def __init__(self):
+        self.r = random.uniform(3, 10)
+
+        self.pos = Vec2(
+            random.uniform(self.r, SCREEN_WIDTH - self.r),
+            random.uniform(self.r, SCREEN_HEIGHT - self.r),
+        )
+
+        self.vel = Vec2(
+            random.uniform(-BUBBLE_MAX_SPEED, BUBBLE_MAX_SPEED),
+            random.uniform(-BUBBLE_MAX_SPEED, BUBBLE_MAX_SPEED),
+        )
+
+        self.color = random.randint(1, 15)
+----
+半径，場所，速度，色の初期値を設定．
+
+[source,python]
+----
+    def update(self):
+        self.pos.x += self.vel.x # <1>
+        self.pos.y += self.vel.y # <1>
+
+        if self.vel.x < 0 and self.pos.x < self.r:
+            self.vel.x *= -1
+
+        if self.vel.x > 0 and self.pos.x > SCREEN_WIDTH - self.r:
+            self.vel.x *= -1
+
+        if self.vel.y < 0 and self.pos.y < self.r:
+            self.vel.y *= -1
+
+        if self.vel.y > 0 and self.pos.y > SCREEN_HEIGHT - self.r:
+            self.vel.y *= -1
+----
+<1> 次の座標を設定
+
+その後は，壁での跳ね返りを実現．
+
+`App` はゲーム全体を表現．
+[source,python]
+----
+class App:
+    def __init__(self):
+        pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Pyxel Bubbles")
+        pyxel.mouse(True)
+
+        self.is_exploded = False
+        self.bubbles = [Bubble() for _ in range(BUBBLE_INITIAL_COUNT)]　# <1>
+
+        pyxel.run(self.update, self.draw) # <2>
+----
+<1> バブルを指定された数の分，設定
+<2> ゲームスタート
+
+[source,python]
+----
+    def update(self):
+        if pyxel.btnp(pyxel.KEY_Q): # <1>
+            pyxel.quit()
+
+        bubble_count = len(self.bubbles) # <2>
+----
+<1> `Q` で終了
+<2> バブルの数をカウント
+
+[source,python]
+----
+        if pyxel.btnp(pyxel.MOUSE_LEFT_BUTTON): # <1>
+            for i in range(bubble_count):
+                bubble = self.bubbles[i]
+                dx = bubble.pos.x - pyxel.mouse_x
+                dy = bubble.pos.y - pyxel.mouse_y
+
+                if dx * dx + dy * dy < bubble.r * bubble.r: # <2>
+                    self.is_exploded = True
+                    new_r = math.sqrt(bubble.r * bubble.r / BUBBLE_EXPLODE_COUNT)
+
+                    for j in range(BUBBLE_EXPLODE_COUNT): # <3>
+                        angle = math.pi * 2 * j / BUBBLE_EXPLODE_COUNT
+
+                        new_bubble = Bubble()
+                        new_bubble.r = new_r
+                        new_bubble.pos.x = bubble.pos.x + (bubble.r + new_r) * math.cos(
+                            angle
+                        )
+                        new_bubble.pos.y = bubble.pos.y + (bubble.r + new_r) * math.sin(
+                            angle
+                        )
+                        new_bubble.vel.x = math.cos(angle) * BUBBLE_MAX_SPEED
+                        new_bubble.vel.y = math.sin(angle) * BUBBLE_MAX_SPEED
+                        self.bubbles.append(new_bubble)
+
+                    del self.bubbles[i] # <4>
+                    break
+----
+<1> マウス左ボタンがおされたか？
+<2> バブルの上でクリックしたか？
+<3> 新しく小さいバブルを作成
+<4> もとのバブルを削除
+
+バブルの合体を以下で実現
+[source,python]
+----
+        for i in range(bubble_count - 1, -1, -1): # <1>
+            bi = self.bubbles[i]
+            bi.update()
+
+            for j in range(i - 1, -1, -1): # <2>
+                bj = self.bubbles[j]
+                dx = bi.pos.x - bj.pos.x
+                dy = bi.pos.y - bj.pos.y
+                total_r = bi.r + bj.r
+
+                if dx * dx + dy * dy < total_r * total_r:
+                    new_bubble = Bubble() # <3>
+                    new_bubble.r = math.sqrt(bi.r * bi.r + bj.r * bj.r)
+                    new_bubble.pos.x = (bi.pos.x * bi.r + bj.pos.x * bj.r) / total_r
+                    new_bubble.pos.y = (bi.pos.y * bi.r + bj.pos.y * bj.r) / total_r
+                    new_bubble.vel.x = (bi.vel.x * bi.r + bj.vel.x * bj.r) / total_r
+                    new_bubble.vel.y = (bi.vel.y * bi.r + bj.vel.y * bj.r) / total_r
+                    self.bubbles.append(new_bubble)
+
+                    del self.bubbles[i] # <4>
+                    del self.bubbles[j] # <4>
+                    bubble_count -= 1 # <4>
+                    break # <4>
+----
+<1> 現在のバブルをリストの後ろの方からとってくる．
+新しく作ってリストに追加したバブルは，合体の対象としないようにしている．
+<2> 今チェックしているバブル以外のバブルについて，合体するかどうかを見ていく．
+<3> 新しいバブルをつくる
+<4> もとのバブルを削除して総数を1減らし，`for` 構造を抜ける
+
+画面の描画と，起動
+[source,python]
+----
+    def draw(self):
+        pyxel.cls(0) #<1>
+
+        for bubble in self.bubbles:
+            pyxel.circ(bubble.pos.x, bubble.pos.y, bubble.r, bubble.color) #<2>
+
+        if not self.is_exploded and pyxel.frame_count % 20 < 10:
+            pyxel.text(96, 50, "CLICK ON BUBBLE", pyxel.frame_count % 15 + 1)
+
+
+App()
+----
+<1> 黒でクリア
+<2> 各バブルを描画
+
+
+////
+==== pyxeleditor
+
+pyxeleditorを使えば，キャラクタの画像などを変更できる．
+（注．大学の環境だと非常に遅い．）
+
+たとえば，`02_jump_game.py` なら，`assets` の下の `jump_game.pyxel` にデータが入っている．
+`assets` のフォルダに行って，トップレベルからのフォルダの場所が表示されている部分に，`powershell` と打ち込んだうえで，
+`pyxeleditor jum_game.pyxel` を実行すれば，このファイルを編集できる．
+////

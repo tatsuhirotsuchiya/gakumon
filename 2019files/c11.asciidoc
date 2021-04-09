@@ -1,0 +1,247 @@
+= 学問への扉：計算機プログラミング入門
+
+== Pyxelをつかったプログラミング
+== 課題
+
+自分のプログラムをつくる．「ゲームでなくてもよいが，pyxelは使うこと」
+----->としていましたが，あくまで「原則」とします．
+
+のこり7/1, 7/8, 7/22でプログラム作成．
+8/5に5分程度で，パワーポイントをつかってプレゼンする．
+そのためのパワーポイント資料作成は，7/22から8/5までに実施．
+
+== ファイルからの読み出しなど
+
+ハングマンで，単語のデータをファイルから読み出すことをかんがえる．
+
+単語のデータが以下の様にテキストファイルで保存されているとする．
+
+.wordfile.txt
+----
+lion
+panda
+cheetah
+bear
+hippopotamus
+rhinoceros
+...
+----
+
+このファイルは，以下の様によみだせる．
+なお，空白や空行は無視することにしている．
+[source,python]
+----
+with open('wordfile.txt', 'r') as f:
+	for row in f:
+		row = row.strip()  # 読んだ行から空白，改行などを削除
+		if row != '':  # 文字が残っている場合
+			print(row)
+----
+
+出力は，
+
+----
+lion
+panda
+cheetah
+bear
+...
+----
+
+これらの単語から，先頭の文字をキーにした辞書を作ってみる．
+（辞書が何かについては，教科書等をみてください．）
+たとえば，pがキーの要素には，pで始まる単語のリストである
+`['panda', 'pig'],` が設定される．
+
+.makedict.py
+[source,python]
+----
+# 辞書
+dict_words = {}
+
+# ファイルから単語を読み出す
+tmp_words = []
+with open('wordfile.txt', 'r') as f:
+    for row in f:
+        row = row.strip()  # 読んだ行から空白，改行などを削除
+        if row != '':  # 文字が残っている場合
+            tmp_words.append(row)
+
+# 単語ごとに先頭の文字をキーにして辞書に追加
+for w in tmp_words:
+    letter = w[0:1]
+    if letter in dict_words:
+        dict_words[letter].append(w)
+    else:
+        dict_words[letter] = [w]
+
+print(dict_words)
+----
+
+結果
+----
+{'l': ['lion', 'lama'], 'p': ['panda', 'pig'], 'c': ['cheetah', 'camel', 'cow', 'cat'], 'b': ['bear', 'bat'], 'h': ['hippopotamus', 'hyena', 'horse'], 'r': ['rhinoceros'], 'g': ['goat'], 'f': ['fox'], 'd': ['dingo', 'dog'], 's': ['sheep'], 'k': ['koala'], 'e': ['elephant'], 't': ['tiger'], 'm': ['mouse', 'mole', 'monkey']}
+----
+
+これをつかって，ハングマンを改良してみる．
+具体的には，先頭の1文字を指定してゲームを始めるようにしてみる．
+
+.pyxelhangman2.py
+[source,python]
+----
+import random
+import pyxel
+
+KEYS_AZ = ((pyxel.KEY_A, 'a'), (pyxel.KEY_B, 'b'), (pyxel.KEY_C, 'c'),
+           (pyxel.KEY_D, 'd'), (pyxel.KEY_E, 'e'), (pyxel.KEY_F, 'f'),
+           (pyxel.KEY_G, 'g'), (pyxel.KEY_H, 'h'), (pyxel.KEY_I, 'i'),
+           (pyxel.KEY_J, 'j'), (pyxel.KEY_K, 'k'), (pyxel.KEY_L, 'l'),
+           (pyxel.KEY_M, 'm'), (pyxel.KEY_N, 'n'), (pyxel.KEY_O, 'o'),
+           (pyxel.KEY_P, 'p'), (pyxel.KEY_Q, 'q'), (pyxel.KEY_R, 'r'),
+           (pyxel.KEY_S, 's'), (pyxel.KEY_T, 't'), (pyxel.KEY_U, 'u'),
+           (pyxel.KEY_V, 'v'), (pyxel.KEY_W, 'w'), (pyxel.KEY_X, 'x'),
+           (pyxel.KEY_Y, 'y'), (pyxel.KEY_Z, 'z'))
+
+
+def get_word():
+    global words  # 関数の外で設定されたwordsを使用する宣言
+    offset = random.randint(0, len(words)-1)
+    return words[offset]
+
+
+def unmask_word(word, letters):
+    st = ""
+    for c in word:
+        for l in letters:
+            if c == l:
+                st = st + c
+                break
+        else:
+            st = st + "_"
+    return st
+
+
+def update():
+    global input_str
+    global output
+    global life
+    global inputLetters
+    global secret
+    global state
+    global words
+    global dict_words
+
+    if pyxel.btnp(pyxel.KEY_ESCAPE):  # ESCで終了
+        pyxel.quit()
+
+    # 状態がゲーム中(1)以外
+    if state != 1:
+        for pyxel_key, char in KEYS_AZ:  # A-Zの入力
+            if pyxel.btnp(pyxel_key):
+                if char in dict_words:
+                    life = 5
+                    inputLetters = char
+                    words = dict_words[char]
+                    secret = get_word()
+                    output = unmask_word(secret, inputLetters)
+                    state = 1
+                return
+
+    # 状態がゲーム中(1)
+    accepted_str = ''
+    for pyxel_key, char in KEYS_AZ:  # A-Zの入力
+        if pyxel.btnp(pyxel_key):
+            input_str = input_str + char
+            break
+    else:
+        if pyxel.btnp(pyxel.KEY_BACKSPACE):  # バックスペース
+            input_str = input_str[:-1]
+        elif pyxel.btnp(pyxel.KEY_ENTER):  # エンター
+            accepted_str = input_str
+            input_str = ''
+
+    # 1字が正しく入力された場合の処理
+    if len(accepted_str) == 1:
+        inputLetters = inputLetters + accepted_str
+        output_next = unmask_word(secret, inputLetters)
+        if output_next == output:
+            life = life - 1
+            if life <= 0:  # 失敗
+                state = 3
+        output = output_next
+        if output == secret:  # 成功
+            state = 2
+
+
+def draw():
+    global input_str
+    global output
+    global life
+    global inputLetters
+    global state
+
+    pyxel.cls(0)
+    if state == 0:
+        pyxel.text(10, 50, "Press any key from A to Z", 15)
+    elif state == 1:
+        pyxel.text(10, 10, output, 10)
+        pyxel.text(10, 20, "Life " + str(life), 8)
+        pyxel.text(10, 30, "Letters tried: " + inputLetters, 7)
+        pyxel.text(10, 50, ">" + input_str, pyxel.frame_count % 16)
+    elif state == 2:
+        pyxel.text(10, 10, output, 10)
+        pyxel.text(10, 20, "Life " + str(life), 8)
+        pyxel.text(10, 30, "Letters tried: " + inputLetters, 7)
+        pyxel.text(10, 40, "Conglatulations!", pyxel.frame_count % 8)
+        pyxel.text(10, 50, "Press any key from A to Z", 15)
+    else:
+        pyxel.text(10, 10, output, 10)
+        pyxel.text(10, 20, "Life " + str(life), 8)
+        pyxel.text(10, 30, "Letters tried: " + inputLetters, 7)
+        pyxel.text(10, 40, "Answer: " + secret, 7)
+        pyxel.text(10, 50, "Press any key from A to Z", 15)
+
+# グローバル変数
+input_str = ''
+output = ''
+life = 0
+secret = ''
+inputLetters = ''
+state = 0  # 0:最初, 1:ゲーム中, 2:成功, 3:失敗
+words = []  # 単語のリスト
+dict_words = {}  # 辞書
+
+# ファイルから単語を読み出す
+tmp_words = []
+with open('wordfile.txt', 'r') as f:
+    for row in f:
+        row = row.strip()  # 読んだ行から空白，改行などを削除
+        if row != '':  # 文字が残っている場合
+            tmp_words.append(row)
+# 単語ごとに先頭の文字をキーにして辞書に追加
+for w in tmp_words:
+    letter = w[0:1]
+    if letter in dict_words:
+        dict_words[letter].append(w)
+    else:
+        dict_words[letter] = [w]
+
+# ゲーム開始
+pyxel.init(160, 80)
+pyxel.run(update, draw)
+----
+
+== プレゼンテーション資料の例
+
+https://github.com/tatsuhirotsuchiya/gakumon/raw/master/meteo.pptx[meteo4.pyについて説明したスライド]
+
+////
+==== pyxeleditor
+
+pyxeleditorを使えば，キャラクタの画像などを変更できる．
+（注．大学の環境だと非常に遅い．）
+
+たとえば，`02_jump_game.py` なら，`assets` の下の `jump_game.pyxel` にデータが入っている．
+`assets` のフォルダに行って，トップレベルからのフォルダの場所が表示されている部分に，`powershell` と打ち込んだうえで，
+`pyxeleditor jum_game.pyxel` を実行すれば，このファイルを編集できる．
+////

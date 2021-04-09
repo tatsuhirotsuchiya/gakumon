@@ -1,0 +1,398 @@
+= 学問への扉：計算機プログラミング入門
+
+== Pyxelをつかったプログラミング
+== 課題
+
+自分のプログラムをつくる．ゲームでなくてもよいが，pyxelは使うこと．
+
+7週くらいを使って，作成．最後に5分程度で，パワーポイントをつかってプレゼンする．
+そのためのパワーポイント資料作成に1週程度を見込むこと．
+
+0から新しいプログラムをつくるのは難しいかもしれない．
+
+既存のプログラムを改造することを考えると良いかもしれない．
+
+== プログラム例その1
+
+https://news.mynavi.jp/article/zeropython-10/[100行程度でブロック崩しゲームを作ってみよう]
+を参考にしている場合，pyxelは使ってないので，以下のpyxel版を試してみるとよい．
+
+.blockpyxel.py
+[source,python]
+----
+# ブロック崩し
+import pyxel
+
+# ボールを表す辞書型データ --- (*1)
+ball = {
+            "dirx": 5, # X方向のボールの速さ
+            "diry": -5,  # Y方向のボールの速さ
+            "x": 100, # ボールの位置
+            "y": 50,
+            "w": 2, # ボールの幅
+           }
+
+# ウィンドウの作成 --- (*2)
+pyxel.init(150,100)
+
+# 画面を描画する --- (*3)
+def draw():
+    pyxel.cls(0) # 既存の描画を破棄
+    # ボールを描画
+    pyxel.circ(ball["x"], ball["y"], ball["w"], 11)
+
+# ボールの移動 --- (*4)
+def update():
+    if pyxel.btnp(pyxel.KEY_Q): # Qでやめる
+        pyxel.quit()
+
+    # 仮の変数に移動後の値を記録
+    bx = ball["x"] + ball["dirx"]
+    by = ball["y"] + ball["diry"]
+    # 上左右の壁に当たった？
+    if bx < 0 or bx > 150: ball["dirx"] *= -1
+    if by < 0 or by > 100: ball["diry"] *= -1
+    # 移動内容を反映
+    if 0 <= bx <= 150: ball["x"] = bx
+    if 0 <= by <= 100: ball["y"] = by
+
+# ゲームループ --- (*5)
+pyxel.run(update, draw)
+----
+
+== プログラム例その2 シューティングゲームをつくってみる
+
+まず，自分を設定．
+`class` は新たなデータの種類をつくるようなイメージ．
+`Plane` で自分の飛行機をつくる．
+データとしては，今は，x座標とy座標をもっているだけ．
+`update()` という関数（専門的にはメソッド）に，
+データに対する操作を記述している．
+ここでは，キーにしたがって左右に動く．
+
+.meteo01.py
+[source,python]
+----
+import random
+import pyxel
+
+SCREEN_WIDTH = 200
+SCREEN_HEIGHT = 255
+
+class Plane:
+    def __init__(self):
+        self.x = SCREEN_WIDTH /2
+        self.y = SCREEN_HEIGHT * 0.8
+    def update(self):
+        if pyxel.btn(pyxel.KEY_LEFT):
+            self.x = max(self.x - 4, 0)
+        if pyxel.btn(pyxel.KEY_RIGHT):
+            self.x = min(self.x + 4, pyxel.width)
+
+plane = Plane()
+
+def update():
+    global plane
+
+    if pyxel.btnp(pyxel.KEY_Q):
+        pyxel.quit()
+    plane.update()
+
+def draw():
+    global plane
+    pyxel.cls(0)
+    pyxel.circ(plane.x, plane.y, 5, 4)
+
+pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Hello Pyxel", scale=4, fps=30)
+pyxel.run(update, draw)
+----
+
+こんどは，隕石だけをつくってみる．こちらは少し複雑．
+
+まず，隕石のクラスをつくる．座標と，生きているか死んでいるか（画面の外にでたか）という
+情報をもたせる．
+
+複数の隕石を管理するのに，リスト`meteos` をつかっている．
+最初はカラ．
+
+ランダムに出現させて，リストにくわえる．これは，`meteos.append(Meteo())` で実現．
+`Meteo()` で新しい隕石ができて，リスト`meteos` に加えられている．
+
+死んでいたら，リストから消去．これはリストの後ろから実行しないといけない．
+理由は，たとえば，１番目を消去して，２番目を消去すると，１番目を消去した段階で，
+２番目の隕石は１番目の隕石になっているので（繰り下がっている）うまくいかない．
+
+
+.meteo02.py
+[source,python]
+----
+import random
+import pyxel
+
+SCREEN_WIDTH = 200
+SCREEN_HEIGHT = 255
+
+class Meteo:
+    def __init__(self):
+        self.x = random.randint(0, SCREEN_WIDTH)
+        self.y = -SCREEN_HEIGHT
+        self.is_dead = False
+
+    def update(self):
+        if self.is_dead == False:
+            self.y += 10
+            if self.y > SCREEN_HEIGHT:
+                self.is_dead = True
+
+meteos = []
+
+def update():
+    global meteos
+
+    if pyxel.btnp(pyxel.KEY_Q):
+        pyxel.quit()
+
+    if random.uniform(0, 1.0) < 0.1:
+        meteos.append(Meteo())
+    for i in range(len(meteos)):
+        meteos[i].update()
+    for i in range(len(meteos)-1,-1,-1):
+        if meteos[i].is_dead == True:
+            del meteos[i]
+
+def draw():
+    global meteos
+
+    pyxel.cls(0)
+    for met in meteos:
+        pyxel.circ(met.x, met.y, 5, 6)
+
+pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Hello Pyxel", scale=4, fps=30)
+pyxel.run(update, draw)
+----
+
+あと，`is_running` という，`False` か `True` の変数をいれて，
+前者の場合はゲームがはじまっていないことを，後者は始まったことを示すようにする．
+`False` の場合は，スペースキーがおされるまで，「スペースキーをおせ」と表示するようにする．
+
+.meteo03.py
+[source,python]
+----
+import random
+import pyxel
+
+SCREEN_WIDTH = 200
+SCREEN_HEIGHT = 255
+
+is_running = False
+
+def update():
+    global is_running
+    global meteos
+    global plane
+
+    if pyxel.btnp(pyxel.KEY_Q):
+        pyxel.quit()
+    if is_running == False:
+        if pyxel.btnp(pyxel.KEY_SPACE):
+            is_running = True
+        return
+
+def draw():
+    global is_running
+
+    pyxel.cls(0)
+    if is_running == False:
+        pyxel.text(5, SCREEN_HEIGHT/2, "Press the Space Key!", pyxel.frame_count % 16)
+    else:  # このelse部分は要消去
+        pyxel.text(5, SCREEN_HEIGHT/2, "The game is being played", 5)
+
+pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Hello Pyxel", scale=4, fps=30)
+pyxel.run(update, draw)
+----
+
+これらをあわせて，とりあえずできたところまでが，以下のプログラム．
+
+.meteo1.py
+[source,python]
+----
+import random
+import pyxel
+
+SCREEN_WIDTH = 200
+SCREEN_HEIGHT = 255
+
+class Meteo:
+    def __init__(self):
+        self.x = random.randint(0, SCREEN_WIDTH)
+        self.y = -SCREEN_HEIGHT
+        self.is_dead = False
+
+    def update(self):
+        if self.is_dead == False:
+            self.y += 10
+            if self.y > SCREEN_HEIGHT:
+                self.is_dead = True
+
+class Plane:
+    def __init__(self):
+        self.x = SCREEN_WIDTH /2
+        self.y = SCREEN_HEIGHT * 0.8
+        self.is_dead = False
+    def update(self):
+        if pyxel.btn(pyxel.KEY_LEFT):
+            self.x = max(self.x - 4, 0)
+        if pyxel.btn(pyxel.KEY_RIGHT):
+            self.x = min(self.x + 4, pyxel.width)
+
+is_running = False
+meteos = []
+plane = Plane()
+
+def update():
+    global is_running
+    global meteos
+    global plane
+
+    if pyxel.btnp(pyxel.KEY_Q):
+        pyxel.quit()
+    if is_running == False:
+        if pyxel.btnp(pyxel.KEY_SPACE):
+            is_running = True
+        return
+
+    plane.update()
+
+    if random.uniform(0, 1.0) < 0.1:
+        meteos.append(Meteo())
+    for i in range(len(meteos)):
+        meteos[i].update()
+    for i in range(len(meteos)-1,-1,-1):
+        if meteos[i].is_dead == True:
+            del meteos[i]
+
+def draw():
+    global is_running
+    global meteos
+    global plane
+
+    pyxel.cls(0)
+    if is_running == False:
+        pyxel.text(5, SCREEN_HEIGHT/2, "Press the Space Key!", pyxel.frame_count % 16)
+    for met in meteos:
+        pyxel.circ(met.x, met.y, 5, 6)
+    pyxel.circ(plane.x, plane.y, 5, 4)
+
+pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Hello Pyxel", scale=4, fps=30)
+pyxel.run(update, draw)
+----
+
+あたり判定をくわえれば，ひとまずゲームにはなる．
+とりあえず，ぶつかったら，無理やり初期設定に戻るようにしておく．
+
+----
+for met in meteos:
+    if -10 < (met.y - plane.y) < 10:
+        if -10 < (met.x - plane.x) < 10:
+            is_running = False
+            meteos = []
+            plane = Plane()
+----
+
+以下，今日の進捗分．
+
+.meteo2.py
+[source,python]
+----
+import random
+import pyxel
+
+SCREEN_WIDTH = 200
+SCREEN_HEIGHT = 255
+
+class Meteo:
+    def __init__(self):
+        self.x = random.randint(0, SCREEN_WIDTH)
+        self.y = -SCREEN_HEIGHT
+        self.is_dead = False
+
+    def update(self):
+        if self.is_dead == False:
+            self.y += 10
+            if self.y > SCREEN_HEIGHT:
+                self.is_dead = True
+
+class Plane:
+    def __init__(self):
+        self.x = SCREEN_WIDTH /2
+        self.y = SCREEN_HEIGHT * 0.8
+        self.is_dead = False
+    def update(self):
+        if pyxel.btn(pyxel.KEY_LEFT):
+            self.x = max(self.x - 4, 0)
+        if pyxel.btn(pyxel.KEY_RIGHT):
+            self.x = min(self.x + 4, pyxel.width)
+
+    #if self.is_dead == False:
+
+
+is_running = False
+meteos = []
+plane = Plane()
+
+def update():
+    global is_running
+    global meteos
+    global plane
+
+    if pyxel.btnp(pyxel.KEY_Q):
+        pyxel.quit()
+    if is_running == False:
+        if pyxel.btnp(pyxel.KEY_SPACE):
+            is_running = True
+        return
+
+    plane.update()
+
+    if random.uniform(0, 1.0) < 0.2:
+        meteos.append(Meteo())
+    for i in range(len(meteos)):
+        meteos[i].update()
+    for i in range(len(meteos)-1,-1,-1):
+        if meteos[i].is_dead == True:
+            del meteos[i]
+
+    for met in meteos:
+        if -10 < (met.y - plane.y) < 10:
+            if -10 < (met.x - plane.x) < 10:
+                is_running = False
+                meteos = []
+                plane = Plane()
+
+def draw():
+    global is_running
+    global meteos
+    global plane
+
+    pyxel.cls(0)
+    if is_running == False:
+        pyxel.text(5, SCREEN_HEIGHT/2, "Press the Space Key!", pyxel.frame_count % 16)
+    for met in meteos:
+        pyxel.circ(met.x, met.y, 5, 6)
+    pyxel.circ(plane.x, plane.y, 5, 4)
+
+pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Hello Pyxel", scale=4, fps=30)
+pyxel.run(update, draw)
+----
+
+
+////
+==== pyxeleditor
+
+pyxeleditorを使えば，キャラクタの画像などを変更できる．
+（注．大学の環境だと非常に遅い．）
+
+たとえば，`02_jump_game.py` なら，`assets` の下の `jump_game.pyxel` にデータが入っている．
+`assets` のフォルダに行って，トップレベルからのフォルダの場所が表示されている部分に，`powershell` と打ち込んだうえで，
+`pyxeleditor jum_game.pyxel` を実行すれば，このファイルを編集できる．
+////
