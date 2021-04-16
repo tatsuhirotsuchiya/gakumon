@@ -13,6 +13,9 @@
 
 - [京大のPythonのテキスト](http://hdl.handle.net/2433/245698)
 
-- []()
+## ブラウザだけでプログラミング
 
-- []()
+- [Google Colaboratory](https://colab.research.google.com/)　
+[(例)](https://colab.research.google.com/drive/1FRPJYCoxy4X1ifzwCRn3JtGCa9ROIfDP)
+
+- [Paiza](https://paiza.io/) Python3を選択
