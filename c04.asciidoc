@@ -184,7 +184,7 @@ def input_letter():
                 break
     return st
 
-life = 5 // <1>
+life = 5 # <1>
 inputLetters = ""
 secret = get_word()
 st = unmask_word(secret, inputLetters)
@@ -192,14 +192,14 @@ print("life:", life)
 print(st)
 while is_correct(secret, inputLetters) == False:
     inputLetters = inputLetters + input_letter()
-    st_next = unmask_word(secret, inputLetters) <2>
+    st_next = unmask_word(secret, inputLetters) # <2>
     print(st_next)
-    if st == st_next: <3>
+    if st == st_next: # <3>
         life = life - 1
         print("life:", life)
         if life <= 0:
-             break // <4>
-    st = st_next <5>
+             break # <4>
+    st = st_next # <5>
 ----
 <1> ライフを導入
 <2> 1字入力する前の状況と，今の状況を区別するため`st_next` を導入
