@@ -27,3 +27,7 @@
 ## Pyxel
 
 - [Pyxelホームページ](https://github.com/kitao/pyxel/blob/master/README.ja.md)
+
+- [WindowsでPathの設定](https://www.javadrive.jp/python/install/index3.html)
+
+- [Homebrewのインストール](https://qiita.com/zaburo/items/29fe23c1ceb6056109fd)
