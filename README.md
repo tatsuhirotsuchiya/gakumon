@@ -9,7 +9,9 @@
 
 ### [3回: 4/23](c03.asciidoc)
 
-### 4回以降 (準備中)
+### [4回: 5/7](c04.asciidoc)
+
+### 5回以降 (準備中)
 
 ## 参考資料など
 
@@ -21,3 +23,7 @@
 [(例)](https://colab.research.google.com/drive/1FRPJYCoxy4X1ifzwCRn3JtGCa9ROIfDP)
 
 - [Paiza](https://paiza.io/) Python3を選択
+
+## Pyxel
+
+- [Pyxelホームページ](https://github.com/kitao/pyxel/blob/master/README.ja.md)
