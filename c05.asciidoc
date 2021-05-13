@@ -1,0 +1,154 @@
+:imagesdir: https://github.com/tatsuhirotsuchiya/gakumon/tree/master/images
+
+= 学問への扉：計算機プログラミング入門
+
+== Pyxelをつかったプログラミング
+
+https://github.com/kitao/pyxel/blob/master/README.ja.md[pyxel] をつかって，
+プログラムを作っていく．
+インストールがまだの人はインストールを完了させよう．
+
+IDELからPyxelを使ったアルゴリズムを実行すると，
+`ESC` を押しても画面が消えないなどの問題がある．
+
+Windowsならコマンドプロンプトから "python ファイル名"，
+Macならターミナルから"python3 ファイル名"として実行する方がよい．
+
+プログラムのファイルをクリックして直接実行してもよい．
+
+実行は，`ESC` キーで終了できる．
+
+=== 座標を理解する
+
+ウィンドウの左上の座標が原点(0,0)．
+X座標は右向きに，Y座標は下向きに増加する．
+
+信号機の描画．
+
+.signal1.py
+[source,python]
+----
+include::src21/signal1.py[lines=1..]
+----
+
+.signal1.py
+[source,python]
+----
+import pyxel
+
+pyxel.init(160, 160)
+
+# 画面の塗りつぶし
+pyxel.cls(1)
+# 長方形
+pyxel.rect(5, 5, 120, 40, 13)
+# 円
+pyxel.circ(30, 25, 15, 11)
+# 円
+pyxel.circb(65, 25, 15, 1)
+
+# 画面表示
+pyxel.show()
+----
+
+==== 練習
+信号機を完成させよう．
+色は0～15で指定．
+https://github.com/kitao/pyxel/blob/master/pyxel/examples/screenshots/05_color_palette.png[カラーパレット]
+
+== 乱数と繰り返し
+
+.circles1.py
+[source,python]
+----
+include::src21/circles1.py[lines=1..]
+----
+
+
+.circles1.py
+[source,python]
+----
+import pyxel
+import random
+
+pyxel.init(160, 160)
+
+# 画面の塗りつぶし
+pyxel.cls(1)
+
+for radius in range(10, 30, 10):
+    color_rand = random.randint(0, 15)
+    pyxel.circb(80, 80, radius, color_rand)
+
+# 画面表示
+pyxel.show()
+----
+
+==== 練習
+
+同心円を増やそう
+
+=== 課題
+
+.circuletile1.py
+[source,python]
+----
+import pyxel
+import random
+
+pyxel.init(160, 160)
+
+# 画面の塗りつぶし
+pyxel.cls(1)
+
+for y in range(0, 161, 20):
+    for x in range(0, 161, 20):
+        # ここに処理を追加して
+        # 課題を完成させる
+
+# 画面表示
+pyxel.show()
+----
+
+image::circletile.png
+
+ランダムな円を敷き詰めよう．
+時間があれば，色が背景とかぶらないようにしよう．
+
+できたところまででよいので，CLEからテキストとして提出すること．
+
+=== 発展課題
+
+アニメーションをつくってみる．
+
+.pyxel_test1.py
+[source,python]
+----
+import pyxel
+
+pyxel.init(160, 120)
+x = 0
+Delta = 10
+
+def update():
+    global x
+    x = (x + Delta) % 160
+
+def draw():
+    global x
+    pyxel.cls(0)
+    pyxel.rect(x, 10, x+10, 20, 11)
+
+pyxel.run(update, draw)
+----
+
+動作が確認できたら，プログラムの意味を調べてみよう．
+
+- `global`
+- `%`
+
+すこし変更を加えてみよう．たとえば，
+
+- 四角形以外の図形を描画
+- 上下にも動かしてみる
+- 動きにランダムな要素を加えてみる
