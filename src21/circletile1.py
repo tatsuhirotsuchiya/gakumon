@@ -3,7 +3,7 @@ import random
 
 pyxel.init(160, 160)
 
-# 画面の塗りつぶし 
+# 画面の塗りつぶし
 pyxel.cls(1)
 
 for y in range(0, 161, 20):

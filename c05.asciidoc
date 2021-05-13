@@ -23,11 +23,13 @@ X座標は右向きに，Y座標は下向きに増加する．
 
 信号機の描画．
 
+////
 .signal1.py
 [source,python]
 ----
 include::src21/signal1.py[lines=1..]
 ----
+////
 
 .signal1.py
 [source,python]
@@ -56,12 +58,20 @@ https://github.com/kitao/pyxel/blob/master/pyxel/examples/screenshots/05_color_p
 
 == 乱数と繰り返し
 
+乱数と繰り返し(特に `for` )をうまく利用しよう．
+
+`random.randint(s, e)`　は整数 `s` から `e` までの範囲の整数をランダムに返す．
+
+`range(s, e, t)` は `s` から始めて，`t` ずつ大きくなる整数を `e` になるまで，繰り返し作る．
+ただし，`e` は作らない．
+
+////
 .circles1.py
 [source,python]
 ----
 include::src21/circles1.py[lines=1..]
 ----
-
+////
 
 .circles1.py
 [source,python]
@@ -88,6 +98,10 @@ pyxel.show()
 
 === 課題
 
+https://github.com/tatsuhirotsuchiya/gakumon/blob/master/images/circletile.png[見本]
+のようにランダムな円を敷き詰めよう．
+以下のプログラムに処理を追加してプログラムを完成させよう，
+
 .circuletile1.py
 [source,python]
 ----
@@ -108,12 +122,7 @@ for y in range(0, 161, 20):
 pyxel.show()
 ----
 
-
-
-ランダムな円を敷き詰めよう．
-https://github.com/tatsuhirotsuchiya/gakumon/blob/master/images/circletile.png[見本]
-
-時間があれば，色が背景とかぶらないようにしよう．
+時間があれば，円の色が背景とかぶらないようにしよう．
 
 できたところまででよいので，CLEからテキストとして提出すること．
 
@@ -130,9 +139,11 @@ pyxel.init(160, 120)
 x = 0
 Delta = 10
 
+
 def update():
     global x
     x = (x + Delta) % 160
+
 
 def draw():
     global x

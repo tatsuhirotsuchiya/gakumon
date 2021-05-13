@@ -11,7 +11,9 @@
 
 ### [4回: 5/7](c04.asciidoc)
 
-### 5回以降 (準備中)
+### [5回: 5/14](c05.asciidoc)
+
+以降 (準備中)
 
 ## 参考資料など
 
@@ -31,3 +33,5 @@
 - [WindowsでPathの設定](https://www.javadrive.jp/python/install/index3.html)
 
 - [Homebrewのインストール](https://qiita.com/zaburo/items/29fe23c1ceb6056109fd)
+
+pipにPathが通っていなければ，py -m pip ... を試してみてください．
