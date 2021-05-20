@@ -34,4 +34,11 @@
 
 - [Homebrewのインストール](https://qiita.com/zaburo/items/29fe23c1ceb6056109fd)
 
-pipにPathが通っていなければ，py -m pip ... を試してみてください．
+Windowsについては，pipにPathが通っていなければ，py -m pip ... を試してみてください．
+もしくは，Pythonを一度アンインストールして，「Add Python 3.9 to PATH」をチェックしてインストールした
+上で，pipを実行してください。
+
+pyxelが動かない場合は，大学のマシンにログインして作業をしてください．
+そのために，VMware Horizon Clientsをインストールしておいてください．
+
+- [VMware Horizon Clients](https://my.vmware.com/jp/web/vmware/downloads/info/slug/desktop_end_user_computing/vmware_horizon_clients/horizon_7_5_0)
