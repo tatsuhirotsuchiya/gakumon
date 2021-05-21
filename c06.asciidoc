@@ -1,0 +1,367 @@
+= 学問への扉：計算機プログラミング入門
+
+== Pyxelをつかったプログラミング
+
+https://github.com/kitao/pyxel/blob/master/README.ja.md[pyxel] をつかって，
+プログラムを作っていく．
+
+ここでは，飛び交うボールに当たらないようにキャラを動かすゲームを考えよう．
+
+
+===== `global`
+
+関数の外の変数を，関数の中で使うときに使う．
+その変数が関数の外のものですよ，という指定．
+
+===== `%`
+
+整数の割り算のあまり．`10 % 3` は `1` である．
+
+
+=== ゲームループ
+
+ゲームでは，キャラクターの状態の更新と画面の描画を高速に繰り返す．
+この繰り返しを *ゲームループ* という．
+
+pyxelでは，キャラクターの状態の更新を行う関数(ここでは `update()` とする)と，
+描画を行う関数(ここでは `draw()` とする)で，1回のループ実行での処理を記述する．
+その上で，
+`pyxel.run(update, draw)` を実行するとゲームループが実行される．
+つまり，`update()` と `draw()` が繰り返し実行される．
+
+=== はじめの一歩
+
+まず，自分のキャラクターをキーボードの←と→で動かせるようにしよう．
+ひとまず，キャラクターは円で表す．
+
+////
+.lesseon1.py
+[source,python]
+----
+include::src21/lesseon1.py[lines=1..]
+----
+////
+
+.lesseon1.py
+[source,python]
+----
+import pyxel
+
+pyxel.init(256, 256)
+
+player_x = 80
+
+
+def update():
+    global player_x
+    if pyxel.btn(pyxel.KEY_LEFT):
+        player_x = max(player_x - 4, 0)
+    if pyxel.btn(pyxel.KEY_RIGHT):
+        player_x = player_x + 4
+
+
+def draw():
+    global player_x
+    pyxel.cls(12)
+    pyxel.circ(player_x, 100, 10, 2)
+
+pyxel.run(update, draw)
+----
+
+==== 練習
+
+画面の右端を超えないようにプログラムを直そう．
+`max` の代わりに `min` を使えば良い．
+
+=== 2次元の移動
+
+キャラクターを上下にも動かせるようにしたい．
+x座標とy座標を表すため，サイズが2のリスト `player` を使っている．
+`player[0]` がx座標， `player[1]` がy座標を表している．
+
+////
+.lesseon2.py
+[source,python]
+----
+include::src21/lesseon2.py[lines=1..]
+----
+////
+
+
+.lesseon2.py
+[source,python]
+----
+import pyxel
+
+pyxel.init(256, 256)
+
+player = [80, 80]
+
+
+def update():
+    global player
+    if pyxel.btn(pyxel.KEY_LEFT):
+        player[0] = max(player[0] - 4, 0)
+    if pyxel.btn(pyxel.KEY_RIGHT):
+        player[0] = player[0] + 4
+    if pyxel.btn(pyxel.KEY_DOWN):
+        player[1] = max(player[1] - 4, 0)
+    if pyxel.btn(pyxel.KEY_UP):
+        player[1] = min(player[1] + 4, 256)
+
+
+def draw():
+    global player
+    pyxel.cls(12)
+    pyxel.circ(player[0], player[1], 10, 2)
+
+pyxel.run(update, draw)
+----
+
+
+==== 練習
+
+変なところを修整しよう．
+
+== ボールの追加
+
+ボールを動かそう．
+ボールには，x座標，y座標，x方向の移動幅，y方向の移動幅という4個の情報を持たせる．
+ゲームループ1回ごとに，ボールの座標を移動幅分変化させている．
+
+////
+.lesseon3.py
+[source,python]
+----
+include::src21/lesseon3.py[lines=1..]
+----
+////
+
+.lesseon3.py
+[source,python]
+----
+import pyxel
+
+pyxel.init(256, 256)
+
+player = [80, 80]
+ball = [0, 0, 5, 7]
+
+
+def update():
+    update_player()
+    update_ball()
+
+
+def update_player():
+    global player
+    if pyxel.btn(pyxel.KEY_LEFT):
+        player[0] = max(player[0] - 4, 0)
+    if pyxel.btn(pyxel.KEY_RIGHT):
+        player[0] = min(player[0] + 4, 256)
+    if pyxel.btn(pyxel.KEY_UP):
+        player[1] = max(player[1] - 4, 0)
+    if pyxel.btn(pyxel.KEY_DOWN):
+        player[1] = min(player[1] + 4, 256)
+
+
+def update_ball():
+    global ball
+    ball[0] = (ball[0] + ball[2]) % 256
+    ball[1] = (ball[1] + ball[3]) % 256
+
+
+def draw():
+    global player, ball
+    pyxel.cls(12)
+    pyxel.circ(player[0], player[1], 10, 2)
+    pyxel.circ(ball[0], ball[1], 10, 4)
+
+pyxel.run(update, draw)
+----
+
+
+== クラス
+
+*クラス* という仕組みをつかって，ボールを定義しよう．
+クラスによって，ボール一つをサイズ4のリストで表すのではなく，
+ボールそれぞれについて，`x` , `y`, `dx` , `dy` の4値をまとめて管理することができる．
+
+`Ball(...)` を実行すると，
+`\\__init__()` が呼ばれ，Ballクラスに属するデータが一つ作り出される．
+下だと，`ball = Ball(0, 0, 5, 7)` を実行したとき，`Ball` が一つつくられ，`ball` で表される．
+そのとき，`\\__init__()` に従って，そのボールの `x` , `y`, `dx` , `dy` の4値が設定される．
+
+`ball.update()` とすると，`update()` が実行される．
+このとき，`self.x` , `self.y` などは，`ball` が表している **この**
+ボールの `x`, `y` である．
+
+////
+.lesseon4.py
+[source,python]
+----
+include::src21/lesseon4.py[lines=1..]
+----
+////
+
+
+.lesseon4.py
+[source,python]
+----
+import pyxel
+
+pyxel.init(256, 256)
+
+
+class Ball:
+    def __init__(self, x, y, dx, dy):
+        self.x = x
+        self.y = y
+        self.dx = dx
+        self.dy = dy
+
+    def update(self):
+        self.x = (self.x + self.dx) % 256
+        self.y = (self.y + self.dy) % 256
+
+    def draw(self):
+        pyxel.circ(self.x, self.y, 10, 4)
+
+player = [80, 80]
+ball = Ball(0, 0, 5, 7)
+
+
+def update():
+    update_player()
+    update_ball()
+
+
+def update_player():
+    global player
+    if pyxel.btn(pyxel.KEY_LEFT):
+        player[0] = max(player[0] - 4, 0)
+    if pyxel.btn(pyxel.KEY_RIGHT):
+        player[0] = min(player[0] + 4, 256)
+    if pyxel.btn(pyxel.KEY_UP):
+        player[1] = max(player[1] - 4, 0)
+    if pyxel.btn(pyxel.KEY_DOWN):
+        player[1] = min(player[1] + 4, 256)
+
+
+def update_ball():
+    global ball, ball2
+    ball.update()
+
+
+def draw():
+    global player, ball
+    pyxel.cls(12)
+    pyxel.circ(player[0], player[1], 10, 2)
+    ball.draw()
+
+pyxel.run(update, draw)
+----
+
+==== 練習
+
+Ballを二つにしてみよう．
+
+=== 課題
+
+次のプログラムでは衝突判定を追加した．
+衝突までのゲームループの実行回数を得点として表示する．
+
+////
+.lesseon5.py
+[source,python]
+----
+include::src21/lesseon5.py[lines=1..]
+----
+////
+
+
+.lesseon5.py
+[source,python]
+----
+import pyxel
+
+pyxel.init(256, 256)
+
+
+class Ball:
+    def __init__(self, x, y, dx, dy):
+        self.x = x
+        self.y = y
+        self.dx = dx
+        self.dy = dy
+
+    def update(self):
+        self.x = (self.x + self.dx) % 256
+        self.y = (self.y + self.dy) % 256
+
+    def draw(self):
+        pyxel.circ(self.x, self.y, 10, 4)
+
+player = [80, 80]
+ball = Ball(0, 0, 5, 7)
+counter = 0
+
+
+def update():
+    update_player()
+    update_ball()
+    detect_collision()
+
+
+def update_player():
+    global player
+    if pyxel.btn(pyxel.KEY_LEFT):
+        player[0] = max(player[0] - 4, 0)
+    if pyxel.btn(pyxel.KEY_RIGHT):
+        player[0] = min(player[0] + 4, 256)
+    if pyxel.btn(pyxel.KEY_UP):
+        player[1] = max(player[1] - 4, 0)
+    if pyxel.btn(pyxel.KEY_DOWN):
+        player[1] = min(player[1] + 4, 256)
+
+
+def update_ball():
+    global ball
+    ball.update()
+
+
+def detect_collision():
+    global player, ball, counter
+    # 長い文を \ で折り返して，複数行に記述
+    if ball.x - 20 < player[0] < ball.x + 20 and \
+    ball.y - 20 < player[1] < ball.y + 20:
+        counter = 0
+    else:
+        counter = counter + 1
+
+
+def draw():
+    global player, ball, counter
+    pyxel.cls(12)
+    pyxel.circ(player[0], player[1], 10, 2)
+    ball.draw()
+    pyxel.text(5, 4, str(counter), 1)
+
+pyxel.run(update, draw)
+----
+
+
+プログラムを拡張して，ボールを2個にしよう．
+
+時間があれば，最高点が表示されるようにしよう．
+
+=== 発展課題
+
+ゲームを発展させよう．たとえば，
+
+- ボールのスピードがだんだん速くなるようにしよう．
+
+- 好きな数にボールの数を設定できるようにしよう
+（ボールをリストで管理する）
+
+- はねかえるボールをつくってみよう

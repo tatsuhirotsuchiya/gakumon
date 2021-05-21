@@ -2,6 +2,7 @@ import pyxel
 
 pyxel.init(256, 256)
 
+
 class Ball:
     def __init__(self, x, y, dx, dy):
         self.x = x
@@ -18,11 +19,12 @@ class Ball:
 
 player = [80, 80]
 ball = Ball(0, 0, 5, 7)
-ball2 = Ball(0, 250, -10, 5)
+
 
 def update():
     update_player()
     update_ball()
+
 
 def update_player():
     global player
@@ -35,16 +37,16 @@ def update_player():
     if pyxel.btn(pyxel.KEY_DOWN):
         player[1] = min(player[1] + 4, 256)
 
+
 def update_ball():
     global ball, ball2
     ball.update()
-    ball2.update()
+
 
 def draw():
     global player, ball
     pyxel.cls(12)
     pyxel.circ(player[0], player[1], 10, 2)
     ball.draw()
-    ball2.draw()
-    
+
 pyxel.run(update, draw)

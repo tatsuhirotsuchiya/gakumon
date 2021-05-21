@@ -4,6 +4,7 @@ pyxel.init(256, 256)
 
 player = [80, 80]
 
+
 def update():
     global player
     if pyxel.btn(pyxel.KEY_LEFT):
@@ -14,6 +15,7 @@ def update():
         player[1] = max(player[1] - 4, 0)
     if pyxel.btn(pyxel.KEY_UP):
         player[1] = min(player[1] + 4, 256)
+
 
 def draw():
     global player

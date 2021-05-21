@@ -2,6 +2,7 @@ import pyxel
 
 pyxel.init(256, 256)
 
+
 class Ball:
     def __init__(self, x, y, dx, dy):
         self.x = x
@@ -18,13 +19,14 @@ class Ball:
 
 player = [80, 80]
 ball = Ball(0, 0, 5, 7)
-ball2 = Ball(0, 250, -10, 5)
 counter = 0
+
 
 def update():
     update_player()
     update_ball()
-    check_()
+    detect_collision()
+
 
 def update_player():
     global player
@@ -37,14 +39,17 @@ def update_player():
     if pyxel.btn(pyxel.KEY_DOWN):
         player[1] = min(player[1] + 4, 256)
 
-def update_ball():
-    global ball, ball2
-    ball.update()
-    ball2.update()
 
-def check_():
-    global player, ball, ball2, counter
-    if ball.x - 10 < player[0] < ball.x + 10 and ball.y - 10 < player[1] < ball.y + 10:
+def update_ball():
+    global ball
+    ball.update()
+
+
+def detect_collision():
+    global player, ball, counter
+    # 長い文を \ で折り返して，複数行に記述
+    if ball.x - 20 < player[0] < ball.x + 20 and \
+    ball.y - 20 < player[1] < ball.y + 20:
         counter = 0
     else:
         counter = counter + 1
@@ -55,7 +60,6 @@ def draw():
     pyxel.cls(12)
     pyxel.circ(player[0], player[1], 10, 2)
     ball.draw()
-    # ball2.draw()
     pyxel.text(5, 4, str(counter), 1)
 
 pyxel.run(update, draw)
