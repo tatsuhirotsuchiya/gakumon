@@ -39,7 +39,7 @@ def update_player():
 
 
 def update_ball():
-    global ball, ball2
+    global ball
     ball.update()
 
 
