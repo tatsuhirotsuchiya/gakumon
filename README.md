@@ -11,9 +11,11 @@
 
 ### [4回: 5/7](c04.asciidoc)
 
-### [5回: 5/14](c05.asciidoc) [回答編](c05_ans.asciidoc)
+### [5回: 5/14](c05.asciidoc) [解答編](c05_ans.asciidoc)
 
-### [6回: 5/21](c06.asciidoc)
+### [6回: 5/21](c06.asciidoc) [解答編](c06_ans.asciidoc)
+
+### [7回: 5/28](c21-07.asciidoc)
 
 以降 (準備中)
 
