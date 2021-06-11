@@ -50,3 +50,7 @@ pyxelが動かない場合は，大学のマシンにログインして作業を
 そのために，VMware Horizon Clientsをインストールしておいてください．
 
 - [VMware Horizon Clients](https://my.vmware.com/jp/web/vmware/downloads/info/slug/desktop_end_user_computing/vmware_horizon_clients/horizon_7_5_0)
+
+## エディタについて
+
+- プログラムを書くのに，IDLEではなくて, [VS Code](https://azure.microsoft.com/ja-jp/products/visual-studio-code/)を使った方が便利かもしれません．
