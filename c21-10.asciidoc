@@ -1,0 +1,70 @@
+= 学問への扉：計算機プログラミング入門
+
+== 6/4で質問があった点
+
+=== ゲームオーバーの表示
+
+6/11の資料を参考．
+draw() の中で，以下の様にして表示する．
+
+[source,python]
+----
+def draw():
+...
+    if state == 'GAMEOVER':
+        pyxel.text(100, 100, 'Game Over', 8)
+...
+----
+
+
+=== カンをよけるゲームで左右移動
+
+プレイヤーにx座標を導入する．
+
+
+[source,python]
+----
+class Player:
+    def __init__(self):
+        self.y = 150
+        self.vy = 0
+        self.x = 200  # <1>
+
+    def update(self):
+        self.y = min(150, self.y + self.vy)
+        self.vy = self.vy + 1
+        if self.y == 150 and pyxel.btnp(pyxel.KEY_SPACE):
+            self.vy = -10
+        if pyxel.btn(pyxel.KEY_RIGHT):  # <2>
+            self.x = min(240, self.x + 4)
+        if pyxel.btn(pyxel.KEY_LEFT):
+            self.x = max(0, self.x - 4)
+
+    def draw(self):
+        pyxel.rectb(self.x, self.y, 16, 16, 15)  # <3>
+----
+
+これで左右に動けるようになる．
+あとは，カンとの当たり判定に，プレイヤーのx座標を反映させる必要が
+ある．
+
+
+=== 経過時間の取得
+
+pyxel.frame_count が，経過フレームの数をあらわす．
+(今の経過フレーム) - (ゲームがスタートしたときの経過フレーム) で，ゲームスタートからの
+経過フレーム数を得られる．
+
+
+== 課題
+
+自分のゲームをつくっていこう．
+
+基本的には，既存のプログラムを変更すればよい．
+絵をつける，音をつける，とかでもOK．
+
+pyxelオフィシャルのサンプルプログラムも是非参考に．
+
+作りたいゲームがあるが，取っ掛かりがつかめない場合は，要相談．
+
+CLEに１，２行でよいので，今日までにできたこと，と，残り時間で行うことを記入．
