@@ -3,12 +3,13 @@
 
 ## 内容
 
-### [1回: 4/9](c01.asciidoc)
+### [1回: 4/12](c01.asciidoc)
 
-### [2回: 4/16](c02.asciidoc)
+### [2回: 4/19](c02.asciidoc)
 
-### [3回: 4/23](c03.asciidoc)
+### [3回: 4/29] 準備中
 
+<!--
 ### [4回: 5/7](c04.asciidoc)
 
 ### [5回: 5/14](c05.asciidoc) [解答編](c05_ans.asciidoc)
@@ -27,11 +28,13 @@
 
 ### 12回: 7/2 CLEから進捗を報告
 
-### [13回: 7/9](c21-13.asciidoc) 
+### [13回: 7/9](c21-13.asciidoc)
 
 ### 14回: 7/16 準備中
 
 ### 15回: 7/30 発表会
+
+-->
 
 ## 参考資料など
 
@@ -56,10 +59,6 @@ Windowsについては，pipにPathが通っていなければ，py -m pip ... �
 もしくは，Pythonを一度アンインストールして，「Add Python 3.9 to PATH」をチェックしてインストールした
 上で，pipを実行してください。
 
-pyxelが動かない場合は，大学のマシンにログインして作業をしてください．
-そのために，VMware Horizon Clientsをインストールしておいてください．
-
-- [VMware Horizon Clients](https://my.vmware.com/jp/web/vmware/downloads/info/slug/desktop_end_user_computing/vmware_horizon_clients/horizon_7_5_0)
 
 ## エディタについて
 
