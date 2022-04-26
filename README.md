@@ -7,10 +7,11 @@
 
 ### [2回: 4/19](c02.asciidoc)
 
-### [3回: 4/29] 準備中
+### [3回: 4/26](c03.asciidoc)
+
+### 4回: 5/10 (準備中)
 
 <!--
-### [4回: 5/7](c04.asciidoc)
 
 ### [5回: 5/14](c05.asciidoc) [解答編](c05_ans.asciidoc)
 
@@ -56,7 +57,7 @@
 - [Homebrewのインストール](https://qiita.com/zaburo/items/29fe23c1ceb6056109fd)
 
 Windowsについては，pipにPathが通っていなければ，py -m pip ... を試してみてください．
-もしくは，Pythonを一度アンインストールして，「Add Python 3.9 to PATH」をチェックしてインストールした
+もしくは，Pythonを一度アンインストールして，「Add Python 3.10 to PATH」をチェックしてインストールした
 上で，pipを実行してください。
 
 
