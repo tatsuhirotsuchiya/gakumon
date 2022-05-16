@@ -58,6 +58,8 @@
 
 - [Homebrewのインストール](https://qiita.com/zaburo/items/29fe23c1ceb6056109fd)
 
+- [スタンドアロン版Pyxelのインストール](https://github.com/kitao/pyxel/blob/main/doc/README.ja.md)
+
 Windowsについては，pipにPathが通っていなければ，py -m pip ... を試してみてください．
 もしくは，Pythonを一度アンインストールして，「Add Python 3.10 to PATH」をチェックしてインストールした
 上で，pipを実行してください。
