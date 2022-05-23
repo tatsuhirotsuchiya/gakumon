@@ -11,7 +11,9 @@
 
 ### [4回: 5/10](c04.asciidoc)
 
-### [5回: 5/17](c05.asciidoc)
+### [5回: 5/17](c05.asciidoc) [解答編](c05_ans.asciidoc)
+
+### [6回: 5/24](c06.asciidoc) 
 
 <!--
 
