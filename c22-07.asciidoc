@@ -1,0 +1,280 @@
+= 学問への扉：計算機プログラミング入門
+
+== Pyxelをつかったプログラミング
+
+引き続き
+https://github.com/kitao/pyxel/blob/main/doc/README.ja.md[pyxel] をつかって，
+ボールに当たらないようにキャラを動かすゲームを考える．
+
+////
+=== 前回の課題＋プレイヤーのクラス化
+
+以下をおこなったプログラムの例
+
+- ボール2個
+
+- 最高点の表示
+
+- プレイヤーをクラスに
+////
+
+== 状態の導入
+
+今のプログラムだとずっとゲーム中になっているので，
+スペースキーを押したらゲームが始まり，
+ボールに当たったら，次のスペースキーが押されるまで
+いったんゲームを停止するようにしたい．
+
+そのため変数をつかって，`GAMEOVER` と `PLAYING` という
+文字列で今の状態を表してみる．
+
+もし，`GAMEOVER` 状態なら，ボールも自分も動かさないようにする．
+この状態で，スペースキーが押されたら，`PLAYING` 状態に状態を変える．
+`PLAYING` 状態では，これまで通りゲームを進める．
+
+[source,python]
+----
+state = 'GAMEOVER'
+
+def update():
+    global counter, highscore, state
+    if state == 'GAMEOVER':
+        if pyxel.btn(pyxel.KEY_SPACE):
+            state = 'PLAYING'
+    else:
+        update_player()
+        update_ball()
+        detect_collision()
+        highscore = max(counter, highscore)
+----
+
+[source,python]
+----
+def detect_collision():
+    global player, ball, ball2, counter, state
+    # 長い文を \ で折り返して，複数行に記述
+    if ball.x - 20 < player[0] < ball.x + 20 and \
+            ball.y - 20 < player[1] < ball.y + 20:
+        counter = 0
+        state = "GAMEOVER"
+    elif ball2.x - 20 < player[0] < ball2.x + 20 and \
+            ball2.y - 20 < player[1] < ball2.y + 20:
+        counter = 0
+        state = "GAMEOVER"
+    else:
+        counter = counter + 1
+----
+
+==== 練習
+
+- ゲーム開始時にBallの位置をリセットしよう．
+
+- ゲームオーバーになったときに，得点が分かるようにしよう
+
+== サウンド
+
+サウンドを足してみよう．
+
+`pyxeleditor` を実行して音をつくってみる．
+ターミナルから `pyxel edit (ファイル名)`  と打って実行．
+
+ファイル名を指定しない場合，`pyxeleditor` を実行したフォルダの中に，`my_resource.pyxres` というファイルができる．
+（今，どのフォルダにいるのかは，`pyxeleditor` のウィンドウのバーに表示されている．）
+ここにサウンドやグラフィックスが保存される．
+再度，`pyxeleditor` を動かすと，このファイルが読み込まれる．
+
+ここではボールとの衝突音を考える．
+まず，∿のページ（♬のとなり）をつかって，SOUNDの0番に適当な音を作成する．SPEEDを1～3くらいにすれば，それっぽく聞こえる．
+出来たら保存．
+
+以下は，この音を鳴らすだけのプログラム．
+`pyxel.play(チャネルの番号0～3, SOUNDの番号)` で音がでる．
+
+[source,python]
+----
+import pyxel
+import random
+
+pyxel.init(256, 256)
+pyxel.load("my_resource.pyxres")  # データファイル読込
+
+pyxel.play(2, 0)  # チャンネル2にSOUND 0を流す
+----
+
+==== 練習
+
+サウンドを作って上のプログラムで音を流そう．
+
+== キャラのグラフィックス
+
+`pyxeleditor` でキャラの絵をかいてみる．
+キャラの絵は，イメージバンクという広いキャンバスの一部にかく．
+キャラを表示するときは，`pyxel.blt()` をつかって，
+座標を指定してイメージバンクから長方形の部分を取ってくる．
+
+以下は，イメージバンク0の左上から16x16の大きさの絵を座標(x, 100)に表示．
+`pyxel.blt()`　のかっこの中の最後の0で，0番の色を透明色に指定．
+
+[source,python]
+----
+import pyxel
+
+pyxel.init(256, 256)
+pyxel.load("my_resource.pyxres")  # データファイル読込
+
+def update():
+    global x
+    x = (x + 10) % 256
+
+def draw():
+    global x
+    pyxel.cls(0)
+    pyxel.blt(x, 100, 0, 0, 0, 16, 16, 1)
+
+x = 10
+pyxel.run(update, draw)
+----
+
+
+==== 練習
+
+絵をかいて，上のプログラムを動かしてみよう．
+
+== 課題
+
+- ボールにあたったら音がでるようにしよう．
+
+- 自分のキャラをデザインして，円の代わりに動かそう．
+円は中心を座標で指定するが，キャラの表示は長方形の左上の座標を
+指定する点に注意！
+
+
+=== 発展課題
+
+- 好きな数にボールの数を設定できるようにしよう
+（ボールをリストで管理する）(先週の発展課題)
+
+- ゲームオーバーの表示を出したりして，ゲームっぽくしよう．
+
+////
+
+発展課題の
+
+- 好きな数にボールの数を設定できるようにしよう
+（ボールをリストで管理する）
+
+
+== プログラムを複数のファイルに分ける
+
+これまで，`import` で `pyxel` や `random` などのモジュールを読み込んでいた．
+自分がつくったプログラム（の一部）も，別のファイルに保存しておいて，
+それを使うプログラムから読み込むことができる．
+
+
+分かりやすいように新しいフォルダをつくって，
+
+- プログラム本体
+- 敵のボールのクラス
+- 自分のキャラのクラス
+
+に分けてみる．
+
+
+=== 課題
+
+次のプログラムでは衝突判定を追加した．
+衝突までのゲームループの実行回数を得点として表示する．
+
+.lesseon5.py
+[source,python]
+----
+include::src21/lesseon5.py[lines=1..]
+----
+
+
+.lesseon5.py
+[source,python]
+----
+import pyxel
+
+pyxel.init(256, 256)
+
+
+class Ball:
+    def __init__(self, x, y, dx, dy):
+        self.x = x
+        self.y = y
+        self.dx = dx
+        self.dy = dy
+
+    def update(self):
+        self.x = (self.x + self.dx) % 256
+        self.y = (self.y + self.dy) % 256
+
+    def draw(self):
+        pyxel.circ(self.x, self.y, 10, 4)
+
+player = [80, 80]
+ball = Ball(0, 0, 5, 7)
+counter = 0
+
+
+def update():
+    update_player()
+    update_ball()
+    detect_collision()
+
+
+def update_player():
+    global player
+    if pyxel.btn(pyxel.KEY_LEFT):
+        player[0] = max(player[0] - 4, 0)
+    if pyxel.btn(pyxel.KEY_RIGHT):
+        player[0] = min(player[0] + 4, 256)
+    if pyxel.btn(pyxel.KEY_UP):
+        player[1] = max(player[1] - 4, 0)
+    if pyxel.btn(pyxel.KEY_DOWN):
+        player[1] = min(player[1] + 4, 256)
+
+
+def update_ball():
+    global ball
+    ball.update()
+
+
+def detect_collision():
+    global player, ball, counter
+    # 長い文を \ で折り返して，複数行に記述
+    if ball.x - 20 < player[0] < ball.x + 20 and \
+    ball.y - 20 < player[1] < ball.y + 20:
+        counter = 0
+    else:
+        counter = counter + 1
+
+
+def draw():
+    global player, ball, counter
+    pyxel.cls(12)
+    pyxel.circ(player[0], player[1], 10, 2)
+    ball.draw()
+    pyxel.text(5, 4, str(counter), 1)
+
+pyxel.run(update, draw)
+----
+
+
+プログラムを拡張して，ボールを2個にしよう．
+
+時間があれば，最高点が表示されるようにしよう．
+
+=== 発展課題
+
+ゲームを発展させよう．たとえば，
+
+- ボールのスピードがだんだん速くなるようにしよう．
+
+- 好きな数にボールの数を設定できるようにしよう
+（ボールをリストで管理する）
+
+- はねかえるボールをつくってみよう
+////
