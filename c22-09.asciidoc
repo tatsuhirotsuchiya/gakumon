@@ -25,58 +25,64 @@
 今回は，pyxeleditor は使わないで，プログラムの中でグラフィックスやサウンドを定義．
 （キャラに凝らない場合におすすめ．）
 
+////
 .initialization.py
 [source,python]
 ----
 include::src22/shooting/initialization.py[lines=1..]
 ----
+////
 
 .initialization.py
 [source,python]
 ----
 import pyxel
 
+
 def initialize():
     # グラフィックス
-    # イメージバンク0に16x16のイメージを書き込む．座標0,0を左上とする．
+    # イメージバンク0に，座標0,0を左上の端のドットとして，16x16のイメージを書き込む
+    # ドットの色を16進数の1数字で表している (0~f)
     pyxel.image(0).set(
-    0,
-    0,
-    [
-    "0000cc8888cc0000",
-    "0000cc8888cc0000",
-    "0000cc777777cc00",
-    "0000cc777777cc00",
-    "0000cc77888877c0",
-    "0000cc77888877c0",
-    "cccc778833bb877c",
-    "cccc778833bb077c",
-    "7777778333387777",
-    "7777778333387777",
-    "778855cccc558877",
-    "778855cccc558877",
-    "8855cc7777cc5588",
-    "8855cc7777cc5588",
-    "00cc00888800cc00",
-    "00cc00888800cc00"
-     ])
+        0,
+        0,
+        [
+            "0000cc8888cc0000",
+            "0000cc8888cc0000",
+            "0000cc777777cc00",
+            "0000cc777777cc00",
+            "0000cc77888877c0",
+            "0000cc77888877c0",
+            "cccc778833bb877c",
+            "cccc778833bb077c",
+            "7777778333387777",
+            "7777778333387777",
+            "778855cccc558877",
+            "778855cccc558877",
+            "8855cc7777cc5588",
+            "8855cc7777cc5588",
+            "00cc00888800cc00",
+            "00cc00888800cc00"])
 
     # サウンド
+    # サウンド0, 1に音を適当に設定
     pyxel.sound(0).set("a3a2c1a1", "p", "7", "s", 5)
     pyxel.sound(1).set("a3a2c2c2", "n", "7742", "s", 5)
 ----
 
+////
 .playerclass.py
 [source,python]
 ----
 include::src22/shooting/playerclass.py[lines=1..]
 ----
-
+////
 
 .playerclass.py
 [source,python]
 ----
 import pyxel
+
 
 class Player:
     def __init__(self):
@@ -94,20 +100,24 @@ class Player:
             self.y = min(self.y + 4, 240)
 
     def draw(self):
+        # イメージバンク0の座標(0,0)から16x16ドットを取ってきて
+        # プレーヤー（飛行機）として表示
         pyxel.blt(self.x, self.y, 0, 0, 0, 16, 16, 0)
 ----
 
-
+////
 .ballclass.py
 [source,python]
 ----
 include::src22/shooting/ballclass.py[lines=1..]
 ----
+////
 
 .ballclass.py
 [source,python]
 ----
 import pyxel
+
 
 class Ball:
     def __init__(self, x, y, dx, dy):
@@ -125,13 +135,13 @@ class Ball:
 ----
 
 
-
+////
 .shooting1.py
 [source,python]
 ----
 include::src22/shooting/shooting1.py[lines=1..]
 ----
-
+////
 
 
 .shooting1.py
@@ -139,9 +149,9 @@ include::src22/shooting/shooting1.py[lines=1..]
 ----
 import pyxel
 import random
-import initialization
-from ballclass import Ball
-from playerclass import Player
+import initialization  # initialization.pyを読み込む
+from ballclass import Ball  # ballclass を Ball.pyから読み込む
+from playerclass import Player  # playerclassをPlayer.pyからを読み込む
 
 pyxel.init(256, 256)
 initialization.initialize()
@@ -212,19 +222,21 @@ pyxel.run(update, draw)
 
 ミサイルを打てるようにする．
 
-まず，ミサイルのクラスを追加．
+まず，ファイルmissileclass.pyに，ミサイルのクラスを記述．
 
-
+////
 .missileclass.py
 [source,python]
 ----
 include::src22/shooting/missileclass.py[lines=1..]
 ----
+////
 
 .missileclass.py
 [source,python]
 ----
 import pyxel
+
 
 class Missile:
     def __init__(self, x, y):
@@ -232,12 +244,10 @@ class Missile:
         self.y = y
         self.dead = False
 
-
     def update(self):
         self.y -= 16
         if self.y < 0:
             self.is_dead = True
-
 
     def draw(self):
         pyxel.rect(self.x, self.y, 2, 16, 8)
@@ -245,14 +255,16 @@ class Missile:
 ----
 
 
-プログラムの本体で，ミサイルの動作を追加．
+次に，プログラムの本体に，ミサイルの動作を追加する．
+スペースキーで発射する．ゲームのスタートは，スペースキーからエンターに変更．
 
-
+////
 .shooting2.py
 [source,python]
 ----
 include::src22/shooting/shooting2.py[lines=1..]
 ----
+////
 
 .shooting2.py
 [source,python]
@@ -262,7 +274,7 @@ import random
 import initialization
 from ballclass import Ball
 from playerclass import Player
-from missileclass import Missile
+from missileclass import Missile  # Missile.pyからmissileclassを読み込む
 
 pyxel.init(256, 256)
 initialization.initialize()
@@ -278,7 +290,8 @@ missiles = []
 def update():
     global state
     if state == 'GAMEOVER':
-        if pyxel.btn(pyxel.KEY_ENTER):
+        # pyxelがスタンドアローンでない場合は，KEY_RETURN → KEY_ENTER
+        if pyxel.btn(pyxel.KEY_RETURN):
             start_game()
             state = 'PLAYING'
     else:
@@ -314,9 +327,12 @@ def update_playing():
             state = 'GAMEOVER'
             hiscore = max(counter, hiscore)
 
+    # スペースキーが押されたら，ミサイルをリストmissilesに追加し，音を出す
     if pyxel.btnp(pyxel.KEY_SPACE):
         missiles.append(Missile(player.x, player.y))
         pyxel.play(0, 0)
+
+    # 画面から消えていないミサイルだけnew_missilesにいれ，新しいmissilesとする
     new_missiles = []
     for m in missiles:
         m.update()
@@ -354,12 +370,13 @@ pyxel.run(update, draw)
 
 
 
-
+////
 .shooting3.py
 [source,python]
 ----
 include::src22/shooting/shooting3.py[lines=1..]
 ----
+////
 
 .shooting3.py
 [source,python]
@@ -385,7 +402,7 @@ missiles = []
 def update():
     global state
     if state == 'GAMEOVER':
-        if pyxel.btn(pyxel.KEY_ENTER):
+        if pyxel.btn(pyxel.KEY_RETURN):
             start_game()
             state = 'PLAYING'
     else:
@@ -427,6 +444,7 @@ def update_playing():
     for m in missiles:
         m.update()
 
+    # ボールとミサイルの当たり判定
     for b in balls:
         for m in missiles:
             if b.x - 10 < m.x < b.x + 10 and \
