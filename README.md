@@ -21,7 +21,7 @@
 
 ### [9回: 6/14](c22-09.asciidoc)
 
-### [10回：6/21](c22-09.asciidoc) [参考：タイルマップ](c22-tilemap.asciidoc)
+### [10回：6/21](c22-10.asciidoc) [参考：タイルマップ](c22-tilemap.asciidoc)
 
 <!--
 
