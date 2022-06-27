@@ -75,6 +75,7 @@ class Ball:
 ----
 
 .shooting3.py
+[source,python]
 ----
 import pyxel
 import random
