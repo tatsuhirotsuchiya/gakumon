@@ -13,3 +13,182 @@ pyxelオフィシャルのサンプルプログラムも是非参考に．
 
 CLEに１，２行でよいので，今日までにできたこと，と，残り時間で行うことを記入．
 ←*できるだけ授業時間中に!*
+
+== 前回の質問があった点
+
+シューティングゲームのプログラムでビームを発射する方法
+
+6/9日のプログラムにbeamclass.pyを追加し，ballclass.pyとshooting3.pyを変更
+
+.beamclass.py
+[source,python]
+----
+import pyxel
+
+
+class Beam:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.dead = False
+        self.counter = 0
+        self.ly = 0
+        
+    def update(self):
+        self.ly += 16
+        #counterの値が50を超えたら消滅
+        self.counter+=1
+        if self.counter>50:
+            self.dead = True
+        
+    def draw(self,x,y):
+        #自機の位置に併せてビームの位置を移動
+        self.x= x-4
+        self.y= y -self.ly +16
+        #当たり判定を取りやすくするためにself.lyを追加
+        pyxel.rect(self.x, self.y, 10, self.ly, 8)
+        pyxel.rect(self.x + 14, self.y, 10, self.ly, 8)
+----
+
+.ballclass.py
+[source,python]
+----
+import pyxel
+
+
+class Ball:
+    def __init__(self, x, y, dx, dy):
+        self.x = x
+        self.y = y
+        self.dx = dx
+        self.dy = dy
+
+    def update(self):
+        self.x = (self.x + self.dx) % 256
+        self.y = (self.y + self.dy)
+        if self.y>256:
+            self.y %=256
+            self.y -=20
+
+    def draw(self):
+        pyxel.circ(self.x + 8, self.y + 8, 8, 4)
+----
+
+.shooting3.py
+----
+import pyxel
+import random
+import initialization
+from ballclass import Ball
+from playerclass import Player
+from missileclass import Missile
+# Beamクラスをインポート
+from beamclass import Beam
+pyxel.init(256, 256)
+initialization.initialize()
+
+counter = 0
+player = Player()
+balls = []
+state = 'GAMEOVER'
+hiscore = 0
+missiles = []
+#Beamを格納する場所
+beams =[]
+
+
+def update():
+    global state
+    if state == 'GAMEOVER':
+        if pyxel.btn(pyxel.KEY_RETURN):
+            start_game()
+            state = 'PLAYING'
+    else:
+        update_playing()
+
+
+def start_game():
+    global counter, balls, player, missiles, beams
+    counter = 0
+    player.x = 120
+    player.y = 220
+    new_balls = []
+    for i in range(8):
+        newball = Ball(100, 0,
+                       random.randint(-8, 8), random.randint(4, 8))
+        new_balls.append(newball)
+    balls = new_balls
+    #missileとbeamを消す
+    missiles=[]
+    beams=[]
+
+def update_playing():
+    global player, balls, counter, state, hiscore, missiles, beams
+    player.update()
+
+    for b in balls:
+        b.update()
+
+    counter = counter + 1
+
+    for b in balls:
+        if b.x - 10 < player.x < b.x + 10 and \
+                b.y - 10 < player.y < b.y + 10:
+            pyxel.play(0, 1)
+            state = 'GAMEOVER'
+            hiscore = max(counter, hiscore)
+
+    if pyxel.btnp(pyxel.KEY_SPACE):
+        missiles.append(Missile(player.x, player.y))
+        pyxel.play(0, 0)
+    for m in missiles:
+        m.update()
+    #Zを押したらビームを発射
+    if pyxel.btnp(pyxel.KEY_Z):
+        beams.append(Beam(player.x,player.y))
+        pyxel.play(0,0)
+    for beam in beams:
+        beam.update()
+    # ボールとミサイルの当たり判定
+    for b in balls:
+        for m in missiles:
+            if b.x - 10 < m.x < b.x + 10 and \
+               b.y - 10 < m.y < b.y + 10:
+                m.dead = True
+                b.y = -10
+
+    new_missiles = []
+    for m in missiles:
+        if m.dead is False:
+            new_missiles.append(m)
+    missiles = new_missiles
+    # ボールとビームの当たり判定
+    for b in balls:
+        for beam in beams:
+            if b.x - 25 < beam.x+5 < b.x + 25 and \
+                b.y - 10 < beam.y+ beam.ly and beam.y < b.y + 10:
+                b.y = -50
+    new_beams = []
+    for beam in beams:
+        if beam.dead is False:
+            new_beams.append(beam)
+    beams = new_beams
+
+def draw():
+    global player, balls, counter, hiscore, missiles, beams
+    pyxel.cls(12)
+    player.draw()
+    for b in balls:
+        b.draw()
+    pyxel.text(5, 4, str(counter), 1)
+    pyxel.text(220, 4, str(hiscore), 1)
+    if state == 'GAMEOVER':
+        pyxel.text(100, 100, 'Game Over', 8)
+    for m in missiles:
+        m.draw()
+    #ビームの描画
+    for b in beams:
+        b.draw(player.x, player.y)
+
+pyxel.run(update, draw)
+----
