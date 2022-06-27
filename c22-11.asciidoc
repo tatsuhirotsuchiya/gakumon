@@ -193,3 +193,196 @@ def draw():
 
 pyxel.run(update, draw)
 ----
+
+== 前回の質問があった点2
+タイルマップを使ったプログラムの書き方．
+
+initializeの部分でtilemapに埋め込んだキャラをクラスに変換している．
+
+my_resource.pyxresの(0,0):壁 (0,1):道 (1,0):プレイヤー横 (1,1):プレイヤー上 (2,0): 敵の画像とタイルマップ0の描画が必要．
+
+.tile.py
+[source,python]
+----
+import pyxel
+pyxel.init(128, 128)
+
+pyxel.load("my_resource.pyxres")  # データファイル読込
+#(0,0):壁 (0,1):道 (1,0):プレイヤー横 (1,1):プレイヤー上 (2,0): 敵
+
+import random
+
+
+class Player:
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
+        self.vx = 0
+        self.vy = 0
+        self.dx = 0
+        self.dy = 0
+
+    def update(self):
+        newx = self.x
+        newy = self.y
+        if self.vx==0 and self.vy==0:
+            if pyxel.btn(pyxel.KEY_RIGHT):
+                newx += 8
+                self.dx = 1
+                self.dy = 0
+            elif pyxel.btn(pyxel.KEY_LEFT):
+                newx -= 8
+                self.dx = -1
+                self.dy = 0
+            elif pyxel.btn(pyxel.KEY_UP):
+                newy -= 8
+                self.dx = 0
+                self.dy = -1
+            elif pyxel.btn(pyxel.KEY_DOWN):
+                newy += 8
+                self.dx = 0
+                self.dy = 1
+            elif self.dx != 0:
+                newx += self.dx*8
+            elif self.dy !=0:
+                newy += self.dy*8
+            # タイルマップから整数値のペア（タプル）を取得
+            (a, b) = pyxel.tilemap(0).pget(newx//8, newy//8)
+            if (a, b) == (0, 1):  # 道がある
+                self.vx = newx - self.x
+                self.vy = newy - self.y
+        else:
+            if self.vx>0:
+                self.vx -=1
+                self.x+=1
+            if self.vx<0:
+                self.vx +=1
+                self.x-=1
+            if self.vy>0:
+                self.vy -=1
+                self.y+=1
+            if self.vy<0:
+                self.vy+=1
+                self.y-=1
+                
+
+    def draw(self):
+        if self.dx==-1:
+            pyxel.blt(self.x, self.y,0, 8, 0, -8,8,7)
+        elif self.dy==1:
+            pyxel.blt(self.x, self.y,0, 8, 8, 8,8,7)
+        elif self.dy==-1:
+            pyxel.blt(self.x, self.y,0, 8, 8, 8,-8,7)
+        else:
+            pyxel.blt(self.x, self.y,0, 8, 0, 8,8,7)
+            
+            
+class Enemy:
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
+        self.vx = 0
+        self.vy = 0
+        self.dx = 0
+        self.dy = 0
+        self.count=1
+        self.state="DOWN"
+        self.rand=0
+
+    def update(self):
+        newx = self.x
+        newy = self.y
+        #countが一定時間を超えたら向きを変更
+        self.count-=1
+        if self.count==0:
+        	self.count = 8*random.randint(0,10)
+        	self.rand=random.randint(0,3)
+        #移動方向の更新
+        if self.rand==0:
+        	self.state="UP"
+        elif self.rand==1:
+        	self.state="DOWN"
+        elif self.rand==2:
+        	self.state="LEFT"
+        elif self.rand==3:
+        	self.state="RIGHT"
+        #敵の移動
+        if self.vx==0 and self.vy==0:
+            if self.state=="RIGHT":
+                newx += 8
+                self.dx = 1
+                self.dy = 0
+            elif self.state=="LEFT":
+                newx -= 8
+                self.dx = -1
+                self.dy = 0
+            elif self.state=="UP":
+                newy -= 8
+                self.dx = 0
+                self.dy = -1
+            elif self.state=="DOWN":
+                newy += 8
+                self.dx = 0
+                self.dy = 1
+            elif self.dx != 0:
+                newx += self.dx*8
+            elif self.dy !=0:
+                newy += self.dy*8
+            # タイルマップから整数値のペア（タプル）を取得
+            (a, b) = pyxel.tilemap(0).pget(newx//8, newy//8)
+            if (a, b) == (0, 1):  # 道がある
+                self.vx = newx - self.x
+                self.vy = newy - self.y
+            else:
+            	#壁にぶつかったら向き変更
+            	self.count = 8*random.randint(0,10)
+            	self.rand= random.randint(0,3)
+        else:
+            if self.vx>0:
+                self.vx -=1
+                self.x+=1
+            if self.vx<0:
+                self.vx +=1
+                self.x-=1
+            if self.vy>0:
+                self.vy -=1
+                self.y+=1
+            if self.vy<0:
+                self.vy+=1
+                self.y-=1
+
+    def draw(self):
+    	pyxel.blt(self.x, self.y,0, 16, 0, 8,8,7)
+
+def update():
+	for player in players:
+	    player.update()
+	for enemy in enemys:
+		enemy.update()
+
+
+def draw():
+    pyxel.cls(0)
+    # タイルマップを表示
+    pyxel.bltm(0, 0, 0, 0, 0, 128, 128,7)
+    for player in players:
+    	player.draw()
+    for enemy in enemys:
+    	enemy.draw()
+    	
+def initialize():
+	for i in range(0,16):
+		for j in range(0,16):
+			(a,b) = pyxel.tilemap(0).pget(i,j)
+			if(a==1 and b==0):
+				players.append(Player(i*8,j*8))
+				pyxel.tilemap(0).set(i,j,["0001"])
+			if(a==2 and b==0):
+				enemys.append(Enemy(i*8,j*8))
+				pyxel.tilemap(0).set(i,j,["0001"])
+
+players=[]
+enemys=[]
+initialize()
+pyxel.run(update, draw)
+----
