@@ -24,7 +24,4 @@
 
 - 時間は，1人3分程度（質問があれば1分程度）．
 
-=== スライド
 
-* プレゼン資料（スライド）のサンプル
-https://github.com/tatsuhirotsuchiya/gakumon/raw/master/meteo.pptx
