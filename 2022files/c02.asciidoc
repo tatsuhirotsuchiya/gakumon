@@ -1,0 +1,223 @@
+= 学問への扉：計算機プログラミング入門
+
+////
+=== 前回課題の回答例
+////
+
+////
+.fizzbuzz1.py
+[source,python]
+----
+include::sources/fizzbuzz1.py[lines=1..]
+----
+////
+
+
+////
+.fizzbuzz1.py
+[source,python]
+----
+for i in range(1, 51):
+    if i % 15 == 0:
+        print("Fizz-Buzz")
+    else:
+        if i % 5 == 0:
+            print("Buzz")
+        else:
+            if i % 3 == 0:
+                print("Fizz")
+            else:
+                print(i)
+----
+////
+
+////
+.fizzbuzz2.py
+[source,python]
+----
+include::sources/fizzbuzz2.py[lines=1..]
+----
+////
+
+////
+.fizzbuzz2.py
+[source,python]
+----
+for i in range(1, 51):
+    if i % 15 == 0:
+        print("Fizz-Buzz")
+    elif i % 5 == 0:
+        print("Buzz")
+    elif i % 3 == 0:
+        print("Fizz")
+    else:
+        print(i)
+----
+////
+
+=== いろいろなif
+`if-elif-elif-...-else`
+
+////
+.abc2.py
+[source,python]
+----
+include::sources/abc2.py[lines=1..]
+----
+////
+
+.abc2.py
+[source,python]
+----
+# a, b, c どれが一番大きい？
+print("a?")
+a = int(input())
+print("b?")
+b = int(input())
+print("c?")
+c = int(input())
+
+if a >= b and a >= c:
+    print(a)
+elif b >= c:
+    print(b)
+else:
+    print(c)
+----
+andは「かつ」．ほかに or「または」とnot「否定」がある．
+
+////
+==== REPL
+Read-eval-print loopの略．入力したプログラム（の一部）を，評価して結果を出直するのを繰り返すような仕組みのこと．
+Python Schell (IDLEを立ち上げたときのウィンドウ)は，そのままでREPLになっている．
+また，コマンドラインで pythonを実行するとREPLになる．
+////
+
+[source]
+----
+>>> a = 10
+>>> a > 5 or a < 5
+True
+>>> a = 5
+>>> a > 5 or a < 5
+False
+----
+
+== くりかえし
+
+while構造で，くりかえしを実現．
+条件がなりたつまで，ループを繰り返す．
+以下は，数あてゲームの単純版．
+
+実行を強制的に終了させたいときは，Ctrlとcを同時に押す．
+
+////
+.guess2.py
+[source,python]
+----
+include::sources/guess2.py[lines=1..]
+----
+////
+
+.guess2.py
+[source,python]
+----
+# これは数あてゲームです
+import random
+
+number = random.randint(1, 10)
+
+print('この数は，1から10までの整数です')
+guess = None #　Noneは値がないことをしめす，特別な記号
+while number != guess:
+    print('数をあててみて？')
+    guess = input()
+    guess = int(guess)
+
+print('あたり！')
+----
+
+何のプログラム？動かしてみよう．
+
+////
+.euclidean.py
+[source,python]
+----
+include::sources/euclidean.py[lines=1..]
+----
+////
+
+.euclidean.py
+[source,python]
+----
+print('a?')
+a = int(input())
+print('b?')
+b = int(input())
+
+mod = a % b
+while mod != 0:
+    a = b
+    b = mod
+    mod = a % b
+print(b)
+----
+
+==== じゃんけん
+
+じゃんけんのプログラム．
+
+////
+.jankenn.py
+[source,python]
+----
+include::sources/janken.py[lines=1..]
+----
+////
+
+.janken.py
+[source,python]
+----
+import random
+jan = ('グー', 'チョキ', 'パー')
+
+while True:
+    a = random.randint(0,2)
+    b = ""
+    while b != '0' and b != '1' and b != '2':
+        print(0, jan[0], 1, jan[1], 2, jan[2], '?')
+        b = input()
+    b = int(b) # 入力を整数に変換
+    print('こちら', jan[b])
+    print('あいて', jan[a])
+
+    if a == b:
+        print('あいこ')
+    elif (a == 0 and b == 1) or (a == 1 and b == 2) or (a == 2 and b == 0):
+        print('まけ :-(')
+        break
+    else:
+        print('かち :-)')
+        break
+----
+`import` はモジュールを取り込む．モジュールとは，Pythonのプログラムをまとめたファイル．ここでは，モジュール `random` を取り込むことで，乱数に関する命令が使えるようになっている．
+
+`(要素0, 要素1, ..., 要素n-1)` は，Pythonでは，タプル (tuple) と呼ばれる．
+書き換えることができない，データの列のことだ．
+
+書き換えできるデータ列は，Pythonではリスト(list)と呼ばれる．
+`[要素0, 要素1, ..., 要素n-1]` のようにして表現する． (次回以降)
+
+`break` は，ループを終了して，繰り返し構造の外にでる（抜ける）．
+繰り返し構造が入れ子になっている場合は，一番内側の繰り返し構造
+(`for` か `while`)の外にでる．
+
+=== 課題
+じゃんけんのプログラムを，どちらかが３回先に勝つまでじゃんけんを繰り返すように変更しよう．
+ヒント: 勝った回数をあらわす変数(variable)を2個つかおう．
+上のプログラムでは `a` , `b` などが変数である．
+
+=== 発展課題
+https://voiceapp-lab.com/apps/kungfu/[ボイスカンフー] (https://gadget.axelmedia.info/%E3%83%9C%E3%82%A4%E3%82%B9%E3%82%AB%E3%83%B3%E3%83%95%E3%83%BC/[参考])の要素を取り入れてみよう．
+
+たとえば，出せる手を4つにする，ヒットポイントを導入して，先に0になった方が負けとなる，など．
