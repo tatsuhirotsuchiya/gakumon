@@ -1,0 +1,252 @@
+= 学問への扉：計算機プログラミング入門
+
+
+=== 前回課題の回答例
+
+
+////
+.fizzbuzz1.py
+[source,python]
+----
+include::sources/fizzbuzz1.py[lines=1..]
+----
+////
+
+
+.fizzbuzz1.py
+[source,python]
+----
+for i in range(1, 51):
+    if i % 15 == 0:
+        print('Fizz-Buzz')
+    else:
+        if i % 5 == 0:
+            print("Buzz")
+        else:
+            if i % 3 == 0:
+                print("Fizz")
+            else:
+                print(i)
+
+----
+
+文字列は，`（シングルクォテーションマーク）で囲むか，"（ダブルクォテーションマーク）で囲む．
+
+////
+.fizzbuzz2.py
+[source,python]
+----
+include::sources/fizzbuzz2.py[lines=1..]
+----
+////
+
+////
+.fizzbuzz2.py
+[source,python]
+----
+for i in range(1, 51):
+    if i % 15 == 0:
+        print("Fizz-Buzz")
+    elif i % 5 == 0:
+        print("Buzz")
+    elif i % 3 == 0:
+        print("Fizz")
+    else:
+        print(i)
+----
+////
+
+=== いろいろなif
+`if-elif-elif-...-else`
+
+上から順番に条件にあてはまるかチェックしていき，
+あてはまった場合，その箇所の命令を実行する．
+
+////
+.abc2.py
+[source,python]
+----
+include::sources/abc2.py[lines=1..]
+----
+////
+
+.abc2.py
+[source,python]
+----
+# a, b, c どれが一番大きい？
+print("a?")
+a = int(input())
+print("b?")
+b = int(input())
+print("c?")
+c = int(input())
+
+if a >= b and a >= c:
+    print(a)
+elif b >= c:
+    print(b)
+else:
+    print(c)
+----
+andは「かつ」のいみ．
+複数の条件がすべて成立しないといけないことを示す．
+条件を組み合わせたり，反対の条件を表すのに，andに加えて，
+or「または」，not「否定」がある．
+
+
+条件が成り立っていれば，`True`，
+成り立っていなければ，`False`　という値になる．
+
+このことを，REPLをつかって確認しよう．
+
+==== REPL
+Read-eval-print loopの略．入力したプログラム（の一部）を実行して，その結果や得られた値を出力するのを，
+インタラクティブに繰り返すことができる．
+ちょっとしたPythonの命令の動作を確認したいときに便利．
+
+Python Schell (IDLEを立ち上げたときのウィンドウ)は，そのままでREPLになっている．
+
+また，ターミナルから，`python`とだけ入力するとREPLになる．
+終了したいときは，`exit()`と入力する．
+
+
+////
+==== REPL
+Read-eval-print loopの略．入力したプログラム（の一部）を，評価して結果を出直するのを繰り返すような仕組みのこと．
+Python Schell (IDLEを立ち上げたときのウィンドウ)は，そのままでREPLになっている．
+また，コマンドラインで pythonを実行するとREPLになる．
+////
+
+[source]
+----
+>>> a = 10
+>>> a > 5 or a < 5
+True
+>>> a = 5
+>>> a > 5 or a < 5
+False
+----
+
+== くりかえし
+
+while構造で，くりかえしを実現．
+条件がなりたつまで，ループを繰り返す．
+
+何のプログラム？動かしてみよう．
+
+////
+.euclidean.py
+[source,python]
+----
+include::sources/euclidean.py[lines=1..]
+----
+////
+
+.euclidean.py
+[source,python]
+----
+print('a?')
+a = int(input())
+print('b?')
+b = int(input())
+
+mod = a % b
+while mod != 0:
+    a = b
+    b = mod
+    mod = a % b
+print(b)
+----
+
+
+
+以下は，数あてゲームの単純版．
+
+実行を強制的に終了させたいときは，Ctrlとcを同時に押す．
+
+////
+.guess2.py
+[source,python]
+----
+include::sources/guess2.py[lines=1..]
+----
+////
+
+.guess2.py
+[source,python]
+----
+# これは数あてゲームです
+import random
+
+number = random.randint(1, 10)
+
+print('この数は，1から10までの整数です')
+guess = None #　Noneは値がないことをしめす，特別な記号
+while number != guess:
+    print('数をあててみて？')
+    guess = input()
+    guess = int(guess)
+
+print('あたり！')
+----
+
+`import` はモジュールを取り込む．モジュールとは，Pythonのプログラムをまとめたファイル．ここでは，モジュール `random` を取り込むことで，乱数に関する命令が使えるようになっている．
+具体的には `random.randint(1, 10)` で，1から10までの整数が，ランダムに得られる．
+
+==== じゃんけん
+
+じゃんけんのプログラム．
+
+////
+.jankenn.py
+[source,python]
+----
+include::sources/janken.py[lines=1..]
+----
+////
+
+.janken.py
+[source,python]
+----
+import random
+jan = ['グー', 'チョキ', 'パー']
+
+while True:
+    a = random.randint(0, 2)
+    b = ""
+    while b != '0' and b != '1' and b != '2':
+        print(0, jan[0], 1, jan[1], 2, jan[2], '?')
+        b = input()
+    b = int(b)  # 入力を整数に変換
+    print('こちら', jan[b])
+    print('あいて', jan[a])
+
+    if a == b:
+        print('あいこ')
+    elif (a == 0 and b == 1) or (a == 1 and b == 2) or (a == 2 and b == 0):
+        print('まけ :-(')
+        break
+    else:
+        print('かち :-)')
+        break
+----
+
+
+`[要素0, 要素1, ..., 要素n-1]` は，Pythonではリスト(list)と呼ばれる．
+複数のデータを，番号をつけて管理できる．
+`jan[0]` なら，最初のデータを表す．
+
+(深く学びたい人へ．`jan` は変化しないので，実はタプル(tuple)の方が適切．)
+
+`break` は，繰り返し構造 (`for` か `while` 構造) の外に出る（抜ける）．
+繰り返し構造が入れ子になっている場合は，一番内側の繰り返し構造の外にでる．
+
+=== 課題
+じゃんけんのプログラムを，どちらかが３回先に勝つまでじゃんけんを繰り返すように変更しよう．
+ヒント: 勝った回数をあらわす変数(variable)を2個つかおう．
+上のプログラムでは `a` , `b` などが変数である．
+
+=== 発展課題
+
+じゃんけんを拡張してみよう．たとえば，出せる手を4つにする，ヒットポイントを導入して，先に0になった方が負けとなる，など．
+

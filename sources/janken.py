@@ -1,13 +1,13 @@
 import random
-jan = ('グー', 'チョキ', 'パー')
+jan = ['グー', 'チョキ', 'パー']
 
 while True:
-    a = random.randint(0,2)
+    a = random.randint(0, 2)
     b = ""
     while b != '0' and b != '1' and b != '2':
         print(0, jan[0], 1, jan[1], 2, jan[2], '?')
         b = input()
-    b = int(b) # 入力を整数に変換
+    b = int(b)  # 入力を整数に変換
     print('こちら', jan[b])
     print('あいて', jan[a])
 
