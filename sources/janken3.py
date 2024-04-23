@@ -4,16 +4,18 @@ JAN = ('グー', 'チョキ', 'パー')
 awin = 0
 bwin = 0
 
+
 def show_wins():
     print('あいて: ', awin, ' こちら: ', bwin)
-     
+
+
 while awin < 3 and bwin < 3:
-    a = random.randint(0,2)
-    b = ""
+    a = random.randint(0, 2)
+    b = None
     while b != '0' and b != '1' and b != '2':
         print(0, JAN[0], 1, JAN[1], 2, JAN[2], '?')
         b = input()
-    b = int(b) # 入力を整数に変換
+    b = int(b)  # 入力を整数に変換
     print('こちら', JAN[b])
     print('あいて', JAN[a])
 
