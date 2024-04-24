@@ -42,7 +42,7 @@ include::sources/janken2.py[lines=1..]
 [source,python]
 ----
 import random
-JAN = ('グー', 'チョキ', 'パー')
+JAN = ['グー', 'チョキ', 'パー']
 
 awin = 0
 bwin = 0
@@ -73,8 +73,20 @@ while awin < 3 and bwin < 3:
 
 == 関数 (function)
 関数(function)は，共通のプログラムをまとめた，プログラムの部品．
-`def function_name():` で，宣言することができる．
-関数の名前を書くことで呼び出す (call)．
+`def 関数名():` で，宣言することができる．
+関数の名前を書くことで呼び出す．
+たとえば，関数名がを `foo` だとすると，`foo()` と書く．
+
+さらに，関数は，引数(ひきすう, parameter)を受け取ることができる．
+そのときは，`def 関数名(引数1, 引数2)` のように宣言する．
+呼び出すときは，`foo(100, "test")` のように，引数に渡す値を書く．
+これは変数でもよい．
+そのときは，変数が指し示しているデータが，引数に渡される．
+
+
+また，関数は，実行結果を返すことができる．
+関数の中で `return` が実行されると， このキーワードの後に指定されている返り値 (戻り値, return value)が，関数を呼び出した先に返される．
+関数の実行はそこで終わって，呼び出した先から実行が続けられる．
 
 次のプログラムは，何をやっているのだろう？
 
@@ -102,8 +114,6 @@ for i in range(2, 100):
         print(i)
 ----
 
-関数は引数(ひきすう, parameter)として入力を受け取ったり， 結果を返したりすることができる．
-return を実行すると， このキーワードの後に指定されている返り値 (戻り値, return value)を，関数を呼び出した先に返して，関数から抜け，呼び出した先から実行が続けられる．
 
 
 
@@ -121,7 +131,7 @@ include::sources/janken3.py[lines=1..]
 [source,python]
 ----
 import random
-JAN = ('グー', 'チョキ', 'パー')
+JAN = ['グー', 'チョキ', 'パー']
 
 awin = 0
 bwin = 0
@@ -187,13 +197,26 @@ print(reverse(s))
 Hangman(相手の考えた単語を当てる2人用のゲーム)のプログラムをつくっていこう．
 関数を一つずつつくって，最後にそれらをつかってプログラムを完成させる．
 
-[参考](https://www.youtube.com/watch?v=leW9ZotUVYo)
+https://www.youtube.com/watch?v=leW9ZotUVYo[参考]
 
 以下では，Hangmanでつかう関数それぞれについて
 REPLをつかって，どのように動作するのかを説明している．
 （最終的に，すべての関数を1つのファイルに書いて，プログラムをつくる．）
 
-単語をランダムに選択．
+===== 単語をランダムに選択する関数
+[source,python]
+----
+import random
+
+
+def get_word():
+    WORDS = "turaco shoebill tropicbird eagle crane peafowl dove \
+            hummingbird puffin cassowary lorikeet flamingo penguin \
+            heron booby owl toucan".split()
+    index = random.randint(0, len(WORDS)-1)
+    return WORDS[index]
+----
+
 
 ----
 >>> import random
@@ -210,18 +233,32 @@ REPLをつかって，どのように動作するのかを説明している．
 'heron'
 ----
 
-単語を，指定された文字の部分だけ表示．
-////
-なお，`for` についている `else` の部分は，`break` が起らなかった場合にのみ実行される．
-////
+注．`文字列.split()` は，文字列を空白を区切りとして分割して，
+分割された文字列からなるリスト(データの並びのこと)をつくる．
+(覚えなくてよいです)
+
+
+===== 単語を，指定された文字の部分だけ表示する関数
+[source,python]
+----
+def unmask_word(word, letters):
+    st = ""
+    for c in word:
+        tmp = "_"
+        for ltr in letters:
+            if c == ltr:
+                tmp = c
+        st = st + tmp
+    return st
+----
 
 ----
 >>> def unmask_word(word, letters):
     st = ""
     for c in word:
         tmp = "_"
-        for l in letters:
-            if c == l:
+        for ltr in letters:
+            if c == ltr:
                 tmp = c
         st = st + tmp
     return st
@@ -230,7 +267,17 @@ REPLをつかって，どのように動作するのかを説明している．
 'p___o_'
 ----
 
-英小文字を1字入力するまでループ．
+
+===== 英小文字を1字入力するまでループする関数
+[source,python]
+----
+def input_letter():
+    while True:
+        print("英文字を1字入力")
+        st = input()
+        if len(st) == 1 and st in 'abcdefghijklmnopqrstuvwxyz':
+            return st
+----
 
 ----
 >>> def input_letter():
@@ -251,14 +298,27 @@ z
 'z'
 ----
 
-正解かどうかを判定．
+===== 正解かどうかを判定する関数
+[source,python]
+----
+def is_correct(secretword, letters):
+    for c in secretword:
+        is_covered = False
+        for ltr in letters:
+            if c == ltr:
+                is_covered = True
+        if not is_covered:
+            return False
+    return True
+----
+
 
 ----
 >>> def is_correct(secretword, letters):
     for c in secretword:
         is_covered = False
-        for l in letters:
-            if c == l:
+        for ltr in letters:
+            if c == ltr:
                 is_covered = True
         if is_covered == False:
             return False
@@ -275,7 +335,11 @@ False
 
 === 課題1
 これらの関数を使ってプログラムを完成させよう．
-これらの関数のあとに，次のコードを追加したプログラムを書いて，動かしてみよう．
+
+まずは，上の関数を全部コピーしたあとに，次のコードを追加したプログラムを書いて，動かしてみよう．
+
+どこからどこまでが関数なのか分かるように，各関数の前後に2行の空行をいれること．
+
 
 [source,python]
 ----
@@ -283,7 +347,7 @@ inputLetters = ""
 secret = get_word()
 st = unmask_word(secret, inputLetters)
 print(st)
-while is_correct(secret, inputLetters) == False:
+while not is_correct(secret, inputLetters):
     inputLetters = inputLetters + input_letter()
     st = unmask_word(secret, inputLetters)
     print(st)

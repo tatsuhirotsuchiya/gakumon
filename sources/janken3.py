@@ -1,5 +1,5 @@
 import random
-JAN = ('グー', 'チョキ', 'パー')
+JAN = ['グー', 'チョキ', 'パー']
 
 awin = 0
 bwin = 0

@@ -1,5 +1,7 @@
 # hangman
 import random
+
+
 def get_word():
     WORDS = "turaco shoebill tropicbird eagle crane peafowl dove \
             hummingbird puffin cassowary lorikeet flamingo penguin \
@@ -7,26 +9,29 @@ def get_word():
     index = random.randint(0, len(WORDS)-1)
     return WORDS[index]
 
+
 def unmask_word(word, letters):
     st = ""
     for c in word:
         tmp = "_"
-        for l in letters:
-            if c == l:
+        for ltr in letters:
+            if c == ltr:
                 tmp = c
         st = st + tmp
     return st
 
+
 def is_correct(secretword, letters):
     for c in secretword:
         is_covered = False
-        for l in letters:
-            if c == l:
+        for ltr in letters:
+            if c == ltr:
                 is_covered = True
-        if is_covered == False:
+        if not is_covered:
             return False
     return True
-    
+
+
 def input_letter():
     while True:
         print("英文字を1字入力")
@@ -34,13 +39,14 @@ def input_letter():
         if len(st) == 1 and st in 'abcdefghijklmnopqrstuvwxyz':
             return st
 
+
 life = 5
 letters = ""
 secret = get_word()
 st = unmask_word(secret, letters)
 print("life:", life)
 print(st)
-while is_correct(secret, letters) == False:
+while not is_correct(secret, letters):
     letters = letters + input_letter()
     st_next = unmask_word(secret, letters)
     print(st_next)
@@ -48,5 +54,5 @@ while is_correct(secret, letters) == False:
         life = life - 1
         print("life:", life)
         if life <= 0:
-             break
+            break
     st = st_next
