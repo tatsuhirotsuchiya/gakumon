@@ -40,7 +40,7 @@ def input_letter():
             return st
 
 
-life = 5
+life = 5  # <1>
 letters = ""
 secret = get_word()
 st = unmask_word(secret, letters)
@@ -48,11 +48,11 @@ print("life:", life)
 print(st)
 while not is_correct(secret, letters):
     letters = letters + input_letter()
-    st_next = unmask_word(secret, letters)
+    st_next = unmask_word(secret, letters)  # <2>
     print(st_next)
-    if st == st_next:
+    if st == st_next:  # <3>
         life = life - 1
         print("life:", life)
         if life <= 0:
-            break
+            break  # <4>
     st = st_next

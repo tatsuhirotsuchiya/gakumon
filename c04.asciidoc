@@ -67,27 +67,27 @@ print(a)
 （ただし，プログラムの理解が難しくなるので，グローバル変数は
 使わないですむなら，使わない方がよい．）
 
+関数の外の変数を読むことは，何もしなくでもできる．
 
 .globallocal3.py
 [source,python]
 ----
-def f(x):
+def f():
     b = a
-    a = x
     print(a, b)
 
 a = 10
 print(a)
-f(100)
+f()
 print(a)
 ----
 
 
 == リスト (list)
 
-データの列を保存するしくみ．
-オフセット (offset)を指定して，要素にアクセスする．
-（注．Python以外では，添え字(そえじ, index)と呼ぶことが多い．）
+データの列を保存したデータ．
+オフセット (offset)を指定して，列（リスト）の要素を指定してアクセスできる．
+（注．Python以外では，オフセットではなく，添え字(そえじ, index)と呼ぶことが多い．）
 
 
 [source,python]
@@ -102,8 +102,8 @@ print(a)
 >>> weekdays[-5]
 'Monday'
 ----
-’append()' で追加．
-'extend()' で，別のリストを追加．
+’append()' で，リストの最後に要素を追加できる．
+'extend()' で，別のリストを後ろに追加できる．
 
 [source,python]
 ----
@@ -116,6 +116,7 @@ print(a)
 ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 ----
 その他，リスト途中への要素の追加や，削除など，いろいろな機能が存在．
+必要になったら調べてみよう．
 
 `len` で，リストの長さを取得．
 [source,python]
@@ -139,7 +140,7 @@ Saturday
 Sunday
 ----
 
-要素を入れ替えることも可能．
+要素の中身を変更することも可能．
 [source,python]
 ----
 >>> weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
@@ -167,59 +168,62 @@ include::sources/hangman.py[lines=1..]
 ----
 # hangman
 import random
+
+
 def get_word():
     WORDS = "turaco shoebill tropicbird eagle crane peafowl dove \
             hummingbird puffin cassowary lorikeet flamingo penguin \
             heron booby owl toucan".split()
-    offset = random.randint(0, len(WORDS)-1)
-    return WORDS[offset]
+    index = random.randint(0, len(WORDS)-1)
+    return WORDS[index]
+
 
 def unmask_word(word, letters):
     st = ""
     for c in word:
-        for l in letters:
-            if c == l:
-                st = st + c
-                break
-        else:
-            st = st + "_"
+        tmp = "_"
+        for ltr in letters:
+            if c == ltr:
+                tmp = c
+        st = st + tmp
     return st
+
 
 def is_correct(secretword, letters):
     for c in secretword:
-        for l in letters:
-            if c == l:
-                break
-        else:
+        is_covered = False
+        for ltr in letters:
+            if c == ltr:
+                is_covered = True
+        if not is_covered:
             return False
     return True
+
 
 def input_letter():
     while True:
         print("英文字を1字入力")
         st = input()
-        st = st.lower()
-        if len(st) == 1:
-            if st in 'abcdefghijklmnopqrstuvwxyz':
-                break
-    return st
+        if len(st) == 1 and st in 'abcdefghijklmnopqrstuvwxyz':
+            return st
 
-life = 5 # <1>
-inputLetters = ""
+
+life = 5  # <1>
+letters = ""
 secret = get_word()
-st = unmask_word(secret, inputLetters)
+st = unmask_word(secret, letters)
 print("life:", life)
 print(st)
-while is_correct(secret, inputLetters) == False:
-    inputLetters = inputLetters + input_letter()
-    st_next = unmask_word(secret, inputLetters) # <2>
+while not is_correct(secret, letters):
+    letters = letters + input_letter()
+    st_next = unmask_word(secret, letters)  # <2>
     print(st_next)
-    if st == st_next: # <3>
+    if st == st_next:  # <3>
         life = life - 1
         print("life:", life)
         if life <= 0:
-             break # <4>
-    st = st_next # <5>
+            break  # <4>
+    st = st_next
 ----
 <1> ライフを導入
 <2> 1字入力する前の状況と，今の状況を区別するため`st_next` を導入
@@ -265,11 +269,12 @@ print(PICS[1])
 ==== Pyxel
 
 次回以降，
-https://github.com/kitao/pyxel/blob/master/README.ja.md[pyxel] をつかって，
+https://github.com/kitao/pyxel/blob/main/docs/README.ja.md[pyxel]をつかって，
 プログラムを作っていく予定．
-インストールしてみること．
+時間があまったら，インストールしてみよう．
 
-インストールできたか確認のため，Pyxelのホームページのサンプルを少し動かしてみよう．
+インストールできたら，確認のため，以下のサンプルを動かしてみよう．
+(Pyxelのウェブページに他のサンプルも多数あり．)
 ////
 .pyxel_test.py
 [source,python]
@@ -285,15 +290,18 @@ import pyxel
 
 pyxel.init(160, 120)
 
+
 def update():
-    if pyxel.btnp(pyxel.KEY_Q):
-        pyxel.quit()
+    pass
+
 
 def draw():
     pyxel.cls(0)
-    pyxel.rect(10, 10, 20, 20, 11)
+    pyxel.rect(10, 10, 20, 20, 12)
+
 
 pyxel.run(update, draw)
 ----
 
-Qで終了．
+
+Escキーを押すと，終了する．
