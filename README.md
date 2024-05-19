@@ -12,6 +12,8 @@
 
 ### [5回: 5/15](c05.asciidoc)
 
+### [MacでのPyxelの使い方](appendix1.asciidoc)
+
 ### [6回: 5/22](c06.asciidoc)
 
 ### [7回: 5/29](c07.asciidoc)
