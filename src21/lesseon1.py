@@ -14,8 +14,8 @@ def update():
 
 
 def draw():
-    global player_x
     pyxel.cls(12)
     pyxel.circ(player_x, 100, 10, 2)
+
 
 pyxel.run(update, draw)
