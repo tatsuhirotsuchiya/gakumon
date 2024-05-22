@@ -294,20 +294,17 @@ pyxel.run(update, draw)
 
 === 課題
 
-作業中
-
 次のプログラムでは衝突判定を追加した．
 衝突までのゲームループの実行回数を得点として表示する．
 
- ////
+////
 .lesseon5.py
 [source,python]
 ----
 include::src21/lesseon5.py[lines=1..]
 ----
- ////
-
 ////
+
 
 .lesseon5.py
 [source,python]
@@ -331,7 +328,9 @@ class Ball:
     def draw(self):
         pyxel.circ(self.x, self.y, 10, 4)
 
-player = [80, 80]
+
+player_x = 80
+player_y = 80
 ball = Ball(0, 0, 5, 7)
 counter = 0
 
@@ -343,38 +342,37 @@ def update():
 
 
 def update_player():
-    global player
+    global player_x, player_y
     if pyxel.btn(pyxel.KEY_LEFT):
-        player[0] = max(player[0] - 4, 0)
+        player_x = max(player_x - 4, 0)
     if pyxel.btn(pyxel.KEY_RIGHT):
-        player[0] = min(player[0] + 4, 256)
-    if pyxel.btn(pyxel.KEY_UP):
-        player[1] = max(player[1] - 4, 0)
+        player_x = player_x + 4
     if pyxel.btn(pyxel.KEY_DOWN):
-        player[1] = min(player[1] + 4, 256)
+        player_y = max(player_y - 4, 0)
+    if pyxel.btn(pyxel.KEY_UP):
+        player_y = min(player_y + 4, 256)
 
 
 def update_ball():
-    global ball
     ball.update()
 
 
 def detect_collision():
-    global player, ball, counter
+    global counter
     # 長い文を \ で折り返して，複数行に記述
-    if ball.x - 20 < player[0] < ball.x + 20 and \
-    ball.y - 20 < player[1] < ball.y + 20:
+    if (ball.x - 20 < player_x < ball.x + 20) and\
+            (ball.y - 20 < player_y < ball.y + 20):
         counter = 0
     else:
         counter = counter + 1
 
 
 def draw():
-    global player, ball, counter
     pyxel.cls(12)
-    pyxel.circ(player[0], player[1], 10, 2)
+    pyxel.circ(player_x, player_y, 10, 2)
     ball.draw()
     pyxel.text(5, 4, str(counter), 1)
+
 
 pyxel.run(update, draw)
 ----
