@@ -291,8 +291,10 @@ pyxel.run(update, draw)
 
 ボールを2つにしてみよう．
 
-////
+
 === 課題
+
+作業中
 
 次のプログラムでは衝突判定を追加した．
 衝突までのゲームループの実行回数を得点として表示する．
@@ -305,6 +307,7 @@ include::src21/lesseon5.py[lines=1..]
 ----
  ////
 
+////
 
 .lesseon5.py
 [source,python]
