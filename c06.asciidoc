@@ -81,23 +81,21 @@ pyxel.run(update, draw)
 引数のなかで最小なものを返す `min()` という関数があるので，
 `max()` の代わりに `min()` を使えば，x座標がある値を超えないようにできる．
 
-なお，`max()` や `min()` は，プログラムの中で定義されていないが，
-組み込み関数といってPythonに最初からある関数で，何もしないでも使える．
+なお，`max()` や `min()` は，プログラムの中で定義されていない．
+これらは，組み込み関数というPythonに最初からある関数で，何もしないでも使える．
 
-////
 === 2次元の移動
 
 キャラクターを上下にも動かせるようにしたい．
-x座標とy座標を表すため，サイズが2のリスト `player` を使っている．
-`player[0]` がx座標， `player[1]` がy座標を表している．
+y座標を表すため， `player_y` を使っている．
 
-  ////
+////
 .lesseon2.py
 [source,python]
 ----
 include::src21/lesseon2.py[lines=1..]
 ----
-  ////
+////
 
 
 .lesseon2.py
@@ -107,25 +105,26 @@ import pyxel
 
 pyxel.init(256, 256)
 
-player = [80, 80]
+player_x = 80
+player_y = 80
 
 
 def update():
-    global player
+    global player_x, player_y
     if pyxel.btn(pyxel.KEY_LEFT):
-        player[0] = max(player[0] - 4, 0)
+        player_x = max(player_x - 4, 0)
     if pyxel.btn(pyxel.KEY_RIGHT):
-        player[0] = player[0] + 4
+        player_x = player_x + 4
     if pyxel.btn(pyxel.KEY_DOWN):
-        player[1] = max(player[1] - 4, 0)
+        player_y = max(player_y - 4, 0)
     if pyxel.btn(pyxel.KEY_UP):
-        player[1] = min(player[1] + 4, 256)
+        player_y = min(player_y + 4, 256)
 
 
 def draw():
-    global player
     pyxel.cls(12)
-    pyxel.circ(player[0], player[1], 10, 2)
+    pyxel.circ(player_x, player_y, 10, 2)
+
 
 pyxel.run(update, draw)
 ----
@@ -135,19 +134,22 @@ pyxel.run(update, draw)
 
 変なところを修整しよう．
 
-== ボールの追加
+
+=== ボールの追加
 
 ボールを動かそう．
-ボールには，x座標，y座標，x方向の移動幅，y方向の移動幅という4個の情報を持たせる．
+ボールには，x座標，y座標，x方向の移動幅，y方向の移動幅(スピード)という4個の情報を持たせる．
 ゲームループ1回ごとに，ボールの座標を移動幅分変化させている．
 
- ////
+
+////
 .lesseon3.py
 [source,python]
 ----
 include::src21/lesseon3.py[lines=1..]
 ----
- ////
+////
+
 
 .lesseon3.py
 [source,python]
@@ -156,8 +158,12 @@ import pyxel
 
 pyxel.init(256, 256)
 
-player = [80, 80]
-ball = [0, 0, 5, 7]
+player_x = 80
+player_y = 80
+ball_x = 0
+ball_y = 0
+ball_dx = 5
+ball_dy = 7
 
 
 def update():
@@ -166,55 +172,61 @@ def update():
 
 
 def update_player():
-    global player
+    global player_x, player_y
     if pyxel.btn(pyxel.KEY_LEFT):
-        player[0] = max(player[0] - 4, 0)
+        player_x = max(player_x - 4, 0)
     if pyxel.btn(pyxel.KEY_RIGHT):
-        player[0] = min(player[0] + 4, 256)
-    if pyxel.btn(pyxel.KEY_UP):
-        player[1] = max(player[1] - 4, 0)
+        player_x = player_x + 4
     if pyxel.btn(pyxel.KEY_DOWN):
-        player[1] = min(player[1] + 4, 256)
+        player_y = max(player_y - 4, 0)
+    if pyxel.btn(pyxel.KEY_UP):
+        player_y = min(player_y + 4, 256)
 
 
 def update_ball():
-    global ball
-    ball[0] = (ball[0] + ball[2]) % 256
-    ball[1] = (ball[1] + ball[3]) % 256
+    global ball_x, ball_y
+    ball_x = (ball_x + ball_dx) % 256
+    ball_y = (ball_y + ball_dy) % 256
 
 
 def draw():
-    global player, ball
     pyxel.cls(12)
-    pyxel.circ(player[0], player[1], 10, 2)
-    pyxel.circ(ball[0], ball[1], 10, 4)
+    pyxel.circ(player_x, player_y, 10, 2)
+    pyxel.circ(ball_x, ball_y, 10, 4)
+
 
 pyxel.run(update, draw)
 ----
 
-
 == クラス
 
-*クラス* という仕組みをつかって，ボールを定義しよう．
-クラスによって，ボール一つをサイズ4のリストで表すのではなく，
-ボールそれぞれについて，`x` , `y`, `dx` , `dy` の4値をまとめて管理することができる．
+ボールを何個も出現させたい．
+そのとき，一個一個のボールに，4つも別々の変数を定義するのは大変である．
 
+そこで，*クラス* という仕組みをつかって，ボールを定義しよう．
+クラスによって，ボールそれぞれについて，`x` , `y`, `dx` , `dy` の4値をまとめて管理することができる．
+
+したのプログラムで， `Ball` がボールのクラスである．
 `Ball(...)` を実行すると，
-`\\__init__()` が呼ばれ，Ballクラスに属するデータが一つ作り出される．
-下だと，`ball = Ball(0, 0, 5, 7)` を実行したとき，`Ball` が一つつくられ，`ball` で表される．
+`\\__init__()` が呼ばれ，Ballクラスのデータが1つ作り出される．
+（ちなみに，クラスから作られた1つ1つのデータを，オブジェクトとか，インスタンスという．）
+下だと，`ball = Ball(0, 0, 5, 7)` を実行したとき，ボールが1つつくられる．
 そのとき，`\\__init__()` に従って，そのボールの `x` , `y`, `dx` , `dy` の4値が設定される．
+また，`ball` という変数で，このデータを指し示すようにしている．
 
-`ball.update()` とすると，`update()` が実行される．
+`ball.update()` とすると，変数 `ball` が指し示している**この**ボールについて，
+`update()` が実行される．
 このとき，`self.x` , `self.y` などは，`ball` が表している **この**
-ボールの `x`, `y` である．
+ボールの `x`, `y` であり，これらの値が更新される．
 
- ////
+////
 .lesseon4.py
 [source,python]
 ----
 include::src21/lesseon4.py[lines=1..]
 ----
- ////
+////
+
 
 
 .lesseon4.py
@@ -239,7 +251,9 @@ class Ball:
     def draw(self):
         pyxel.circ(self.x, self.y, 10, 4)
 
-player = [80, 80]
+
+player_x = 80
+player_y = 80
 ball = Ball(0, 0, 5, 7)
 
 
@@ -249,35 +263,35 @@ def update():
 
 
 def update_player():
-    global player
+    global player_x, player_y
     if pyxel.btn(pyxel.KEY_LEFT):
-        player[0] = max(player[0] - 4, 0)
+        player_x = max(player_x - 4, 0)
     if pyxel.btn(pyxel.KEY_RIGHT):
-        player[0] = min(player[0] + 4, 256)
-    if pyxel.btn(pyxel.KEY_UP):
-        player[1] = max(player[1] - 4, 0)
+        player_x = player_x + 4
     if pyxel.btn(pyxel.KEY_DOWN):
-        player[1] = min(player[1] + 4, 256)
+        player_y = max(player_y - 4, 0)
+    if pyxel.btn(pyxel.KEY_UP):
+        player_y = min(player_y + 4, 256)
 
 
 def update_ball():
-    global ball
     ball.update()
 
 
 def draw():
-    global player, ball
     pyxel.cls(12)
-    pyxel.circ(player[0], player[1], 10, 2)
+    pyxel.circ(player_x, player_y, 10, 2)
     ball.draw()
+
 
 pyxel.run(update, draw)
 ----
 
 ==== 練習
 
-Ballを二つにしてみよう．
+ボールを2つにしてみよう．
 
+////
 === 課題
 
 次のプログラムでは衝突判定を追加した．

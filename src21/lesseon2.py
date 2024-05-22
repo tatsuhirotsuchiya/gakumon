@@ -2,24 +2,25 @@ import pyxel
 
 pyxel.init(256, 256)
 
-player = [80, 80]
+player_x = 80
+player_y = 80
 
 
 def update():
-    global player
+    global player_x, player_y
     if pyxel.btn(pyxel.KEY_LEFT):
-        player[0] = max(player[0] - 4, 0)
+        player_x = max(player_x - 4, 0)
     if pyxel.btn(pyxel.KEY_RIGHT):
-        player[0] = player[0] + 4
+        player_x = player_x + 4
     if pyxel.btn(pyxel.KEY_DOWN):
-        player[1] = max(player[1] - 4, 0)
+        player_y = max(player_y - 4, 0)
     if pyxel.btn(pyxel.KEY_UP):
-        player[1] = min(player[1] + 4, 256)
+        player_y = min(player_y + 4, 256)
 
 
 def draw():
-    global player
     pyxel.cls(12)
-    pyxel.circ(player[0], player[1], 10, 2)
+    pyxel.circ(player_x, player_y, 10, 2)
+
 
 pyxel.run(update, draw)

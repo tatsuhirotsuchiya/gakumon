@@ -17,7 +17,9 @@ class Ball:
     def draw(self):
         pyxel.circ(self.x, self.y, 10, 4)
 
-player = [80, 80]
+
+player_x = 80
+player_y = 80
 ball = Ball(0, 0, 5, 7)
 
 
@@ -27,26 +29,25 @@ def update():
 
 
 def update_player():
-    global player
+    global player_x, player_y
     if pyxel.btn(pyxel.KEY_LEFT):
-        player[0] = max(player[0] - 4, 0)
+        player_x = max(player_x - 4, 0)
     if pyxel.btn(pyxel.KEY_RIGHT):
-        player[0] = min(player[0] + 4, 256)
-    if pyxel.btn(pyxel.KEY_UP):
-        player[1] = max(player[1] - 4, 0)
+        player_x = player_x + 4
     if pyxel.btn(pyxel.KEY_DOWN):
-        player[1] = min(player[1] + 4, 256)
+        player_y = max(player_y - 4, 0)
+    if pyxel.btn(pyxel.KEY_UP):
+        player_y = min(player_y + 4, 256)
 
 
 def update_ball():
-    global ball
     ball.update()
 
 
 def draw():
-    global player, ball
     pyxel.cls(12)
-    pyxel.circ(player[0], player[1], 10, 2)
+    pyxel.circ(player_x, player_y, 10, 2)
     ball.draw()
+
 
 pyxel.run(update, draw)
