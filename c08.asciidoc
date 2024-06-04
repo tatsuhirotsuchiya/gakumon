@@ -1,0 +1,245 @@
+= 学問への扉：計算機プログラミング入門
+
+== Pyxelをつかったプログラミング
+
+流れてくる障害物をジャンプでよけるゲームを作ってみる．
+https://scratch.mit.edu/projects/41310490/[似たゲーム]
+
+== ジャンプ
+
+まず，主人公がジャンプする部分．
+
+////
+.jump01.py
+[source,python]
+----
+include::sources/jump01.py[lines=1..]
+----
+////
+
+[source,python]
+----
+import pyxel
+pyxel.init(256, 256)
+
+
+class Player:
+    def __init__(self):
+        self.y = 150  # y座標
+        self.dy = 0   # ジャンプ/落下のスピード
+
+    def update(self):
+        self.y = min(150, self.y + self.dy)
+        self.dy = min(self.dy + 1, 8)
+        if self.y == 150 and pyxel.btnp(pyxel.KEY_SPACE):
+            self.dy = -5
+
+    def draw(self):
+        pyxel.rectb(200, self.y, 16, 16, 15)
+
+
+player = Player()
+
+
+def update():
+    player.update()
+
+
+def draw():
+    pyxel.cls(0)
+    player.draw()
+
+
+pyxel.run(update, draw)
+----
+
+==== 練習
+
+もう少し高く飛ぶようにしよう．
+
+== 障害物（カン）を導入してゲームっぽく
+
+障害物が流れてきてジャンプしてよける，といったゲームをつくってみる．
+https://game.watch.impress.co.jp/docs/news/1432645.html[イメージしているゲーム]
+
+////
+.jump02.py
+[source,python]
+----
+include::sources/jump02.py[lines=1..]
+----
+////
+
+[source,python]
+----
+import pyxel
+pyxel.init(256, 256)
+
+
+class Player:
+    def __init__(self):
+        self.y = 150  # y座標
+        self.dy = 0   # ジャンプ/落下のスピード
+
+    def update(self):
+        self.y = min(150, self.y + self.dy)
+        self.dy = min(self.dy + 1, 8)
+        if self.y == 150 and pyxel.btnp(pyxel.KEY_SPACE):
+            self.dy = -5
+
+    def draw(self):
+        pyxel.rectb(200, self.y, 16, 16, 15)
+
+
+class Can:
+    def __init__(self, x, dx):
+        self.x = x
+        self.dx = dx
+
+    def update(self):
+        self.x = self.x + self.dx
+        if self.x > 256:  # 左端に到達したら右端に移動
+            self.x = -20
+
+    def draw(self):
+        pyxel.rectb(self.x, 150, 16, 16, 12)
+
+
+class Block:
+    def __init__(self, x, col):
+        self.x = x
+        self.col = col
+
+    def update(self):
+        self.x = self.x + 4
+        if self.x >= 256:
+            self.x = -64
+
+    def draw(self):
+        pyxel.rectb(self.x, 166, 64, 16, self.col)
+
+
+player = Player()
+cans = [Can(-100, 5), Can(-250, 8)]  # カンのリスト
+life = 0
+blocks = [Block(0, 1), Block(64, 2), Block(128, 1),
+          Block(192, 2), Block(-64, 1)]  # ブロックのリスト
+
+
+def update():
+    global life
+    if life <= 0:
+        if pyxel.btnp(pyxel.KEY_SPACE):
+            life = 20
+    else:
+        player.update()
+        for can in cans:
+            can.update()
+            if can.x - 10 < 200 < can.x + 10 and \
+                    140 <= player.y <= 150:  # あたり判定
+                life = life - 1
+                break
+        for block in blocks:
+            block.update()
+
+
+def draw():
+    pyxel.cls(0)
+    player.draw()
+    for can in cans:
+        can.draw()
+    pyxel.text(0, 0, str(life), 10)
+    for block in blocks:
+        block.draw()
+
+
+pyxel.run(update, draw)
+----
+
+==== 練習
+
+- 障害物（カンのつもり）を3個にしよう．
+- ゲームを再開するとき，カンの位置をクリアしよう．
+
+== ドット絵のキャラクターを表示
+
+四角形ですましていたキャラクターを，ドット絵にする．
+
+Pyxel Editorを実行して，キャラの絵をかいてみる．
+（実行の方法は，先週のページに記載．）
+
+キャラの絵は，イメージバンクという広いキャンバスの一部にかく．
+イメージバンクは，0,1,2の３つ．
+キャラを表示するときは，`pyxel.blt()` をつかって，
+座標を指定してイメージバンクから長方形の部分を取ってくる．
+
+
+- `pyxel.blt(x, y, img, u, v, w, h, [colkey])`
+
+使い方：イメージバンクimg(0-2) の (u, v) からサイズ (w, h) の領域を (x, y) にコピーする．
+w、hは，コピーする領域の幅と高さ．それぞれに負の値を設定すると水平、垂直方向に反転．
+colkeyは指定しなくてもよい．色を指定すると透明色として扱われる．
+
+以下は，上のプログラムを変更して，自分のキャラを長方形から，ドット絵にしたもの．
+イメージバンク0の左上から16x16の大きさの絵を，長方形の代わりに表示している．
+データファイルとして `my_resource.pyxres` を読み込んでいる．
+
+[source,python]
+----
+import pyxel
+pyxel.init(256, 256)
+pyxel.load("my_resource.pyxres")  # データファイル読込
+
+
+class Player:
+    def __init__(self):
+        self.y = 150  # y座標
+        self.dy = 0   # ジャンプ/落下のスピード
+
+    def update(self):
+        self.y = min(150, self.y + self.dy)
+        self.dy = min(self.dy + 1, 8)
+        if self.y == 150 and pyxel.btnp(pyxel.KEY_SPACE):
+            self.dy = -5
+
+    def draw(self):
+        pyxel.blt(200, self.y, 0, 0, 0, 16, 16)
+...
+----
+
+自分でドット絵を描かなくても，
+pyxelのサンプルプログラムのデータを利用することもできる．
+ターミナルから `pyxel copy_examples` を実行すると，
+今のフォルダに新しく `pyxel_examples` というフォルダが作られて，そこに
+サンプルプログラムが保存される．
+これらのプログラムが使うキャラなどのデータは，さらに下のフォルダ `assets` の中に保存されている．
+
+たとえば，プログラム `02_jump_game.py` が使っているデータは，ファイル
+`jump_game.pyxres` に入っている．
+このファイルをコピーして，自分のプログラムと同じフォルダに置くと，
+プログラムの中から，以下のようにファイル名を指定してデータを取り込む
+ことができる．
+
+[source,python]
+----
+pyxel.load("jump_game.pyxres")
+----
+
+データを編集する場合は，ターミナルから `pyxel edit jump_game.pyxres` と入力すると，このファイルをPyxel editor から開くことができる．
+データのファイルの名前は，もちろん変えてもよい．
+
+== 課題
+
+キャラをドット絵にしたり音楽を足して上のプログラムを拡張しよう．
+スコアやハイスコアも出したい．
+
+拡張の例
+
+- スコアを表示（難度★）
+- ハイスコアを表示（難度★）
+- ゲームオーバーの表示を出したりして，ゲームっぽくしよう（難度★）
+- 左右に動けるようにしよう（難度★★★）
+- 障害物にあたったら音がでるようにしよう（難度★★）
+- 正方形の代わりに自分のキャラを表示（難度★★）
+- 正方形の代わりに障害物のキャラを表示（難度★★）
+- 障害物にぶつかったら，しばらく無敵になるとか？（難度★★★★）
