@@ -1,0 +1,439 @@
+
+ボールのプログラムを拡張していく．
+
+=== プログラムの分割
+
+プログラムを1つのファイルだけに書いて行くと，サイズが大きくなったとき，
+見通しが悪くなる．
+そこで，プログラムを複数のファイルに分けて記述してみある．
+ここでは，ballなどのクラスを，別のファイルに分けて記述してみる．
+別のファイルで記述したクラスは，`import` をつかって呼び出せる．
+ここでは，分けたファイルは，同じフォルダにいれておくものとする．
+
+今回は以下のファイルにプログラムを記述する．
+
+- classes.py
+- shooting1.py (あとで，shooting2.py，shooting3.pyと拡張していく)
+
+`shooting1.py` が本体なので，
+ターミナルから実行するときは，`pyxel run shooting1.py` とする．
+
+今回は，pyxel editor は使わないで，プログラムの中でグラフィックスとサウンドを定義した．
+プログラム内で定義しなくても，すでにみたように，データファイルをつくって， `pyxel.load("ファイルの名前")` として，
+データファイルを読み込むことができる．
+
+==== クラスの定義
+まず，クラスの定義．
+あとで使うので，ミサイルも定義しておく．
+
+////
+.classes.py
+[source,python]
+----
+include::sources/shooting/classes.py[lines=1..]
+----
+////
+
+.classes.py
+[source,python]
+----
+import pyxel
+
+
+class Player:
+    def __init__(self):
+        self.x = 120
+        self.y = 220
+
+    def update(self):
+        if pyxel.btn(pyxel.KEY_LEFT):
+            self.x = max(self.x - 4, 0)
+        if pyxel.btn(pyxel.KEY_RIGHT):
+            self.x = min(self.x + 4, 240)
+        if pyxel.btn(pyxel.KEY_UP):
+            self.y = max(self.y - 4, 0)
+        if pyxel.btn(pyxel.KEY_DOWN):
+            self.y = min(self.y + 4, 240)
+
+    def draw(self):
+        # イメージバンク0の座標(0,0)から16x16ドットを取ってきて
+        # プレーヤー（飛行機）として表示
+        pyxel.blt(self.x, self.y, 0, 0, 0, 16, 16, 0)
+
+
+class Ball:
+    def __init__(self, x, y, dx, dy):
+        self.x = x
+        self.y = y
+        self.dx = dx
+        self.dy = dy
+
+    def update(self):
+        self.x = (self.x + self.dx) % 256
+        self.y = (self.y + self.dy) % 256
+
+    def draw(self):
+        pyxel.circ(self.x + 8, self.y + 8, 8, 4)
+
+
+class Missile:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.dead = False
+
+    def update(self):
+        self.y -= 16
+        if self.y < 0:
+            self.is_dead = True
+
+    def draw(self):
+        pyxel.rect(self.x, self.y, 2, 16, 8)
+        pyxel.rect(self.x + 14, self.y, 2, 16, 8)
+----
+
+- クラスは，データの種類と，そのデータへの操作を定義
+- クラスの名前を関数のように呼び出したとき， \__init__(...) の部分が実行されて，
+    そのデータが１つできる．（１つのデータは，オブジェクトまたはインスタンスと呼ぶ）
+- \__init__(...) のあとの，   `def ..`   で，つくったデータに対する操作を定義 (メソッドと呼ぶ)
+- メソッドの実行法． mがデータを指す変数，methodが操作の名前として，`m.method(...)`  
+
+クラスについては，詳しくは本やネットを参考にすること．
+
+
+==== プログラム本体
+次にプログラム本体．
+
+////
+.shooting1.py
+[source,python]
+----
+include::sources/shooting/shooting1.py[lines=1..]
+----
+////
+
+
+.shooting1.py
+[source,python]
+----
+import pyxel
+import random
+import initialization  # initialization.pyを読み込む
+from ballclass import Ball  # ballclass を Ball.pyから読み込む
+from playerclass import Player  # playerclassをPlayer.pyからを読み込む
+
+pyxel.init(256, 256)
+initialization.initialize()
+
+counter = 0
+player = Player()
+balls = []
+state = 'GAMEOVER'
+hiscore = 0
+
+
+def update():
+    global state
+    if state == 'GAMEOVER':
+        if pyxel.btn(pyxel.KEY_SPACE):
+            start_game()
+            state = 'PLAYING'
+    else:
+        update_playing()
+
+
+def start_game():
+    global counter, balls, player
+    counter = 0
+    player.x = 120
+    player.y = 220
+    new_balls = []
+    for i in range(8):
+        newball = Ball(100, 0,
+                       random.randint(-8, 8), random.randint(4, 8))
+        new_balls.append(newball)
+    balls = new_balls
+
+
+def update_playing():
+    global player, balls, counter, state, hiscore
+    player.update()
+    for b in balls:
+        b.update()
+
+    counter = counter + 1
+
+    for b in balls:
+        if b.x - 10 < player.x < b.x + 10 and \
+                b.y - 10 < player.y < b.y + 10:
+            pyxel.play(0, 0)
+            state = 'GAMEOVER'
+            hiscore = max(counter, hiscore)
+
+
+def draw():
+    global player, balls, counter, hiscore
+    pyxel.cls(12)
+    player.draw()
+    for b in balls:
+        b.draw()
+    pyxel.text(5, 4, str(counter), 1)
+    pyxel.text(220, 4, str(hiscore), 1)
+    if state == 'GAMEOVER':
+        pyxel.text(100, 100, 'Game Over', 8)
+
+pyxel.run(update, draw)
+----
+
+
+
+=== ミサイル
+
+ミサイルをスペースキーで打てるようにする．
+
+////
+.shooting2.py
+[source,python]
+----
+include::sources/shooting/shooting2.py[lines=1..]
+----
+////
+
+.shooting2.py
+[source,python]
+----
+import pyxel
+import random
+from classes import Ball  # ballclass を classes.py から読み込む
+from classes import Player  # playerclass を classes.py からを読み込む
+from classes import Missile  # Missile を classes.py からを読み込む
+
+pyxel.init(256, 256)
+
+# 飛行機のイメージ
+pyxel.images[0].set(
+    0,
+    0,
+    [
+        "0000cc8888cc0000",
+        "0000cc8888cc0000",
+        "0000cc777777cc00",
+        "0000cc777777cc00",
+        "0000cc77888877c0",
+        "0000cc77888877c0",
+        "cccc778833bb877c",
+        "cccc778833bb077c",
+        "7777778333387777",
+        "7777778333387777",
+        "778855cccc558877",
+        "778855cccc558877",
+        "8855cc7777cc5588",
+        "8855cc7777cc5588",
+        "00cc00888800cc00",
+        "00cc00888800cc00"])
+
+# サウンド
+pyxel.sounds[0].set("a3a2c1a1", "p", "7", "s", 5)
+pyxel.sounds[1].set("a3a2c2c2", "n", "7742", "s", 5)
+
+# 変数
+counter = 0
+player = Player()
+balls = []
+hiscore = 0
+missiles = []
+
+
+def start_game():
+    global counter, balls, player, missiles
+    counter = 0
+    player = Player()
+    balls = []
+    for i in range(8):
+        newball = Ball(100, 0,
+                       random.randint(-8, 8), random.randint(4, 8))
+        balls.append(newball)
+    missiles = []
+
+
+def update():
+    global counter, hiscore, missiles
+    counter = counter + 1
+    player.update()
+    for b in balls:
+        b.update()
+    for b in balls:
+        if b.x - 10 < player.x < b.x + 10 and \
+                b.y - 10 < player.y < b.y + 10:
+            pyxel.play(0, 0)
+            hiscore = max(counter, hiscore)
+            start_game()
+    # スペースキーが押されたら，ミサイルをリストmissilesに追加し，音を出す
+    if pyxel.btnp(pyxel.KEY_SPACE):
+        missiles.append(Missile(player.x, player.y))
+        pyxel.play(0, 0)
+    # 画面から消えていないミサイルだけnew_missilesにいれ，新しいmissilesとする
+    new_missiles = []
+    for m in missiles:
+        m.update()
+        if m.dead is False:
+            new_missiles.append(m)
+    missiles = new_missiles
+
+
+def draw():
+    pyxel.cls(12)
+    player.draw()
+    for b in balls:
+        b.draw()
+    pyxel.text(5, 4, str(counter), 1)
+    pyxel.text(220, 4, str(hiscore), 1)
+    for m in missiles:
+        m.draw()
+
+
+start_game()
+pyxel.run(update, draw)
+----
+
+
+=== ミサイルと敵との当たり判定
+
+ボールとミサイルが当たったら，どちも消えるように，プログラムを修整．
+このプログラムでは，ミサイルが当たった場合，以下の様に処理．
+
+- ボールは，画面上部に瞬間的に移動
+
+- ミサイルは実際に消滅 (リスト `missiles` から削除)
+
+
+////
+.shooting3.py
+[source,python]
+----
+include::sources/shooting/shooting3.py[lines=1..]
+----
+////
+
+.shooting3.py
+[source,python]
+----
+import pyxel
+import random
+from classes import Ball  # ballclass を classes.py から読み込む
+from classes import Player  # playerclass を classes.py からを読み込む
+from classes import Missile  # Missile を classes.py からを読み込む
+
+pyxel.init(256, 256)
+
+# 飛行機のイメージ
+pyxel.images[0].set(
+    0,
+    0,
+    [
+        "0000cc8888cc0000",
+        "0000cc8888cc0000",
+        "0000cc777777cc00",
+        "0000cc777777cc00",
+        "0000cc77888877c0",
+        "0000cc77888877c0",
+        "cccc778833bb877c",
+        "cccc778833bb077c",
+        "7777778333387777",
+        "7777778333387777",
+        "778855cccc558877",
+        "778855cccc558877",
+        "8855cc7777cc5588",
+        "8855cc7777cc5588",
+        "00cc00888800cc00",
+        "00cc00888800cc00"])
+
+# サウンド
+pyxel.sounds[0].set("a3a2c1a1", "p", "7", "s", 5)
+pyxel.sounds[1].set("a3a2c2c2", "n", "7742", "s", 5)
+
+# 変数
+counter = 0
+player = Player()
+balls = []
+hiscore = 0
+missiles = []
+
+
+def start_game():
+    global counter, balls, player, missiles
+    counter = 0
+    player = Player()
+    balls = []
+    for i in range(8):
+        newball = Ball(100, 0,
+                       random.randint(-8, 8), random.randint(4, 8))
+        balls.append(newball)
+    missiles = []
+
+
+def update():
+    global counter, hiscore, missiles
+    counter = counter + 1
+    player.update()
+    for b in balls:
+        b.update()
+    for b in balls:
+        if b.x - 10 < player.x < b.x + 10 and \
+                b.y - 10 < player.y < b.y + 10:
+            pyxel.play(0, 0)
+            hiscore = max(counter, hiscore)
+            start_game()
+    # スペースキーが押されたら，ミサイルをリストmissilesに追加し，音を出す
+    if pyxel.btnp(pyxel.KEY_SPACE):
+        missiles.append(Missile(player.x, player.y))
+        pyxel.play(0, 0)
+    # ボールとミサイルの当たり判定
+    for b in balls:
+        for m in missiles:
+            if b.x - 10 < m.x < b.x + 10 and \
+               b.y - 10 < m.y < b.y + 10:
+                m.dead = True
+                b.y = -10
+    # 画面から消えていないミサイルだけnew_missilesにいれ，新しいmissilesとする
+    new_missiles = []
+    for m in missiles:
+        m.update()
+        if m.dead is False:
+            new_missiles.append(m)
+    missiles = new_missiles
+
+
+def draw():
+    pyxel.cls(12)
+    player.draw()
+    for b in balls:
+        b.draw()
+    pyxel.text(5, 4, str(counter), 1)
+    pyxel.text(220, 4, str(hiscore), 1)
+    for m in missiles:
+        m.draw()
+
+
+start_game()
+pyxel.run(update, draw)
+----
+
+
+== 課題
+
+作りたいゲームの案を考えよう．
+基本的には，既存のプログラムを変更すればよい．
+絵をつける，音をつける，とかでもOK．
+
+pyxelオフィシャルのサンプルプログラムも是非参考に．
+これらを改造してもよい．
+
+
+作りたいゲームがあるが，取っ掛かりがつかめない場合は，要相談．
+
+// CLEに１，２行でよいので，作りたいゲームの概要を記入．
+
+== 来週以降
+
+自分のゲームをつくっていく．
