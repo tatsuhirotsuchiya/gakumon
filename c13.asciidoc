@@ -34,7 +34,7 @@ pyxelオフィシャルのサンプルプログラムも是非参考に．
 === スライド
 
 * プレゼン資料（スライド）のサンプル
-https://github.com/tatsuhirotsuchiya/gakumon/raw/master/meteo.pptx
+https://github.com/tatsuhirotsuchiya/gakumon/blob/5ed257af25776e581c4a8b545e22a58331ebd560/gakumon-sample2024.pptx
 
 * このスライドで説明しているプログラムは以下の通り．
 (9回目の授業で示している `classes.py` が必要)
