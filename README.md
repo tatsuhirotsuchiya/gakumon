@@ -2,6 +2,10 @@
 
 ## 内容
 
+### [01回: 4/16](c01.asciidoc)
+
+
+<!-- 2024
 ### [1回: 4/10](c01.asciidoc)
 
 ### [2回: 4/17](c02.asciidoc)
@@ -33,6 +37,7 @@
 ### [14回：7/17](c14.asciidoc)
 
 ### [15回：7/24](c15.asciidoc)
+-->
 
 <!-- 2022?
 
@@ -78,7 +83,12 @@
 - [Google Colaboratory](https://colab.research.google.com/)　
 [(例)](https://colab.research.google.com/drive/1FRPJYCoxy4X1ifzwCRn3JtGCa9ROIfDP)
 
-- [Paiza](https://paiza.io/) 「一覧」からPython3を選択
+- [Paiza](https://paiza.io/) 「コード作成を試してみる」→「一覧」からPython3を選択
+
+## エディタについて
+
+- ２回目以降，プログラムを書くのに，IDLEではなくて, [VS Code](https://azure.microsoft.com/ja-jp/products/visual-studio-code/)を使うようにします．
+
 
 ## Pyxel
 
@@ -94,6 +104,3 @@ Windowsについては，pipにPathが通っていなければ，py -m pip ... �
 
 -->
 
-## エディタについて
-
-- プログラムを書くのに，IDLEではなくて, [VS Code](https://azure.microsoft.com/ja-jp/products/visual-studio-code/)を使った方が便利かもしれません．
