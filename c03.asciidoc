@@ -1,0 +1,404 @@
+= 学問への扉：計算機プログラミング入門
+
+== 復習
+
+=== 前々回課題で `if-elif-else` を使った例
+
+Fizz, Buzzの`if-elif-else` をつかった場合．
+
+////
+.fizzbuzz2.py
+[source,python]
+----
+include::sources/fizzbuzz2.py[lines=1..]
+----
+////
+
+
+.fizzbuzz2.py
+[source,python]
+----
+for i in range(1, 51):
+    if i % 15 == 0:
+        print("Fizz-Buzz")
+    elif i % 5 == 0:
+        print("Buzz")
+    elif i % 3 == 0:
+        print("Fizz")
+    else:
+        print(i)
+----
+
+=== 前回課題の回答例
+変数をつかって，勝った回数を記録．
+ここでは，コンピュータが勝った回数を `a_win`, 自分が勝った回数を `b_win` で記録している．
+
+////
+.janken2.py
+[source,python]
+----
+include::src25/janken2.py[lines=1..]
+----
+////
+
+.janken2.py
+[source,python]
+----
+import random
+JAN = ['グー', 'チョキ', 'パー']
+
+a_win = 0
+b_win = 0
+while a_win < 3 and b_win < 3:
+    a = random.randint(0, 2)
+    b = None
+    while b != '0' and b != '1' and b != '2':
+        print(0, JAN[0], 1, JAN[1], 2, JAN[2], '?')
+        b = input()
+    b = int(b)  # 入力を整数に変換
+    print('こちら', JAN[b])
+    print('あいて', JAN[a])
+
+    if a == b:
+        print('あいこ')
+    elif (a == 0 and b == 1) or (a == 1 and b == 2) or (a == 2 and b == 0):
+        print('まけ :-(')
+        a_win = a_win + 1
+        print('あいて: ', a_win, ' こちら: ', b_win)
+    else:
+        print('かち :-)')
+        b_win = b_win + 1
+        print('あいて: ', a_win, ' こちら: ', b_win)
+----
+
+`while` の条件は `True` のままで，ループを `break`
+ する(ループを抜ける)ようにしてもよい．
+
+////
+.janken3.py
+[source,python]
+----
+include::src25/janken3.py[lines=1..]
+----
+////
+
+.janken3.py
+[source,python]
+----
+import random
+JAN = ['グー', 'チョキ', 'パー']
+
+a_win = 0
+b_win = 0
+while True:
+    a = random.randint(0, 2)
+    b = None
+    while b != '0' and b != '1' and b != '2':
+        print(0, JAN[0], 1, JAN[1], 2, JAN[2], '?')
+        b = input()
+    b = int(b)  # 入力を整数に変換
+    print('こちら', JAN[b])
+    print('あいて', JAN[a])
+
+    if a == b:
+        print('あいこ')
+    elif (a == 0 and b == 1) or (a == 1 and b == 2) or (a == 2 and b == 0):
+        print('まけ :-(')
+        a_win = a_win + 1
+        print('あいて: ', a_win, ' こちら: ', b_win)
+        if a_win == 3:
+            break
+    else:
+        print('かち :-)')
+        b_win = b_win + 1
+        print('あいて: ', a_win, ' こちら: ', b_win)
+        if b_win == 3:
+            break
+----
+
+
+== 関数 (function)
+関数(function)は，共通のプログラムをまとめた，プログラムの部品．
+`def 関数名():` で，宣言することができる．
+関数の名前を書くことで呼び出す．
+たとえば，関数名がを `foo` だとすると，`foo()` と書く．
+
+さらに，関数は，引数(ひきすう, parameter)を受け取ることができる．
+そのときは，`def 関数名(引数1, 引数2)` のように宣言する．
+呼び出すときは，`foo(100, "test")` のように，引数に渡す値を書く．
+これは変数でもよい．
+そのときは，変数が指し示しているデータが，引数に渡される．
+
+
+また，関数は，実行結果を返すことができる．
+関数の中で `return` が実行されると， このキーワードの後に指定されている返り値 (return value 戻り値とも呼ぶ)が，関数を呼び出した先に返される．
+関数の実行はそこで終わって，呼び出した先から実行が続けられる．
+
+次のプログラムは，何をやっているのだろう？
+
+////
+.primeloop.py
+[source,python]
+----
+include::sources/primeloop.py[lines=1..]
+----
+////
+
+.primeloop.py
+[source,python]
+----
+def is_prime(number):
+    for i in range(2, number):
+        if number % i == 0:  # number is not prime
+            return False
+
+    return True  # number is prime
+
+
+for i in range(2, 100):
+    if is_prime(i):
+        print(i)
+----
+
+
+じゃんけんのプログラムの一部を関数にしてみる．
+
+////
+.janken4.py
+[source,python]
+----
+include::src25/janken4.py[lines=1..]
+----
+////
+
+.janken4.py
+[source,python]
+----
+import random
+JAN = ['グー', 'チョキ', 'パー']
+
+a_win = 0
+b_win = 0
+
+
+def show_wins():
+    print('あいて: ', a_win, ' こちら: ', b_win)
+
+
+while a_win < 3 and b_win < 3:
+    a = random.randint(0, 2)
+    b = None
+    while b != '0' and b != '1' and b != '2':
+        print(0, JAN[0], 1, JAN[1], 2, JAN[2], '?')
+        b = input()
+    b = int(b)  # 入力を整数に変換
+    print('こちら', JAN[b])
+    print('あいて', JAN[a])
+
+    if a == b:
+        print('あいこ')
+    elif (a == 0 and b == 1) or (a == 1 and b == 2) or (a == 2 and b == 0):
+        print('まけ :-(')
+        a_win = a_win + 1
+        show_wins()
+    else:
+        print('かち :-)')
+        b_win = b_win + 1
+        show_wins()
+----
+
+
+=== Hangman
+
+Hangman(相手の考えた単語を当てる2人用のゲーム)のプログラムをつくっていこう．
+関数を一つずつつくって，最後にそれらをつかってプログラムを完成させる．
+
+https://www.youtube.com/watch?v=leW9ZotUVYo[参考用のビデオ]
+
+以下では，Hangmanでつかう関数それぞれについて
+PythonのREPL（インタラクティブモード）をつかって，どのように動作するのかを説明している．
+
+（ここでは，それぞれの関数の動きを見ていく．
+その後，これらすべての関数を1つのファイルに記述して，プログラムを完成させる．）
+
+
+
+===== 単語をランダムに選択する関数
+[source,python]
+----
+import random
+
+
+def get_word():
+    WORDS = "turaco shoebill tropicbird eagle crane peafowl dove \
+            hummingbird puffin cassowary lorikeet flamingo penguin \
+            heron booby owl toucan".split()
+    index = random.randint(0, len(WORDS)-1)
+    return WORDS[index]
+----
+
+
+----
+>>> import random
+>>> def get_word():
+    WORDS = "turaco shoebill tropicbird eagle crane peafowl dove \
+            hummingbird puffin cassowary lorikeet flamingo penguin \
+            heron booby owl toucan".split()
+    index = random.randint(0, len(WORDS)-1)
+    return WORDS[index]
+
+>>> get_word()
+'flamingo'
+>>> get_word()
+'heron'
+----
+
+注．`文字列.split()` は，文字列を空白を区切りとして分割して，
+分割された文字列からなるリスト(データの並びのこと)をつくる．
+(覚えなくてよいです)
+
+
+===== 単語を，指定された文字の部分だけ表示する関数
+[source,python]
+----
+def unmask_word(word, letters):
+    st = ""
+    for c in word:
+        tmp = "_"
+        for ltr in letters:
+            if c == ltr:
+                tmp = c
+        st = st + tmp
+    return st
+----
+
+----
+>>> def unmask_word(word, letters):
+    st = ""
+    for c in word:
+        tmp = "_"
+        for ltr in letters:
+            if c == ltr:
+                tmp = c
+        st = st + tmp
+    return st
+
+>>> unmask_word("python", "opqr")
+'p___o_'
+----
+
+
+===== 英小文字を1字入力するまでループする関数
+[source,python]
+----
+def input_letter():
+    while True:
+        print("英文字を1字入力")
+        st = input()
+        if len(st) == 1 and st in 'abcdefghijklmnopqrstuvwxyz':
+            return st
+----
+
+----
+>>> def input_letter():
+    while True:
+        print("英文字を1字入力")
+        st = input()
+        if len(st) == 1 and st in 'abcdefghijklmnopqrstuvwxyz':
+            return st
+
+
+>>> input_letter()
+英文字を1字入力
+ab
+英文字を1字入力
+B
+英文字を1字入力
+z
+'z'
+----
+
+===== 正解かどうかを判定する関数
+[source,python]
+----
+def is_correct(secret_word, letters):
+    for c in secret_word:
+        is_covered = False
+        for ltr in letters:
+            if c == ltr:
+                is_covered = True
+        if not is_covered:
+            return False
+    return True
+----
+
+
+----
+>>> def is_correct(secret_word, letters):
+    for c in secret_word:
+        is_covered = False
+        for ltr in letters:
+            if c == ltr:
+                is_covered = True
+        if is_covered == False:
+            return False
+    return True
+
+
+>>> is_correct("python", "nohhhtyp")
+True
+>>> is_correct("python", "python")
+True
+>>> is_correct("python", "thon")
+False
+----
+
+=== 課題1
+これらの関数を使ってゲームのプログラムを完成させよう．
+
+==== ステップ1
+
+まずは，上の関数を全部コピーしたあとに，次のコードを追加したプログラムを書いて，動かしてみよう．
+
+どこからどこまでが関数なのか分かるように，各関数の前後に2行の空行をいれること．
+
+
+[source,python]
+----
+inputLetters = ""
+secret = get_word()
+st = unmask_word(secret, inputLetters)
+print(st)
+while not is_correct(secret, inputLetters):
+    inputLetters = inputLetters + input_letter()
+    st = unmask_word(secret, inputLetters)
+    print(st)
+----
+
+==== ステップ2
+
+プログラムを完成させよう．
+1文字ずつ小文字の英文字を入力していき，6回間違える前に全部の文字を当てることができたら
+勝ち，そうでなければ負けとする．
+
+間違える度に，ライフ（あと何回間違えられるかを示す）が減っていくのが分かるようにしてみよう．
+
+=== 発展課題
+アスキーアートで，元のゲームを再現してみよう．
+改行を含んだ文字列を，''' で挟むことで指定できる．
+----
+>>> PIC1 = '''
+ +---+
+     |
+     |
+     |
+    ==='''
+>>> print(PIC1)
+
+ +---+
+     |
+     |
+     |
+    ===
+>>>
+----
