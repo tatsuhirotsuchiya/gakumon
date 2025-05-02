@@ -1,0 +1,339 @@
+= 学問への扉：計算機プログラミング入門
+
+== 関数 (function) つづき
+関数はプログラムの部品のこと．
+
+
+=== 変数のスコープ (scope)
+
+何が出力される？
+
+////
+.globallocal1.py
+[source,python]
+----
+include::sources/globallocal1.py[lines=1..]
+----
+////
+
+.globallocal1.py
+[source,python]
+----
+def f(x):
+    a = x
+
+
+a = 10
+print(a)
+f(100)
+print(a)
+----
+
+ここで，関数 `f(x)` の中の `x` は仮引数（かりひきすう, parameter）という．
+一方，`f(x)` を呼び出している `f(100)` の中の `100` は実引数 (じつひきすう, argument)という．
+
+関数が呼び出されたとき，仮引数が実引数に置き換えられて，その関数が実行される．
+
+
+関数の中で定義される変数(上の例だと `a = 10` のように，関数の中で最初に出たとき
+ `=` の左にある変数)は，
+その関数だけで有効．
+同じ名前でも，関数の外や，他の関数で定義された変数と区別される．
+
+// 変数が有効な範囲をスコープとよぶ．この例では，`a` のスコープは関数 `f` の中だけ．
+
+////
+.globallocal2.py
+[source,python]
+----
+include::sources/globallocal2.py[lines=1..]
+----
+////
+
+
+.globallocal2.py
+[source,python]
+----
+def f(x):
+    global a
+    a = x
+
+
+a = 10
+print(a)
+f(100)
+print(a)
+----
+
+関数の外で定義されている変数（グローバル変数）が示しているデータを，関数内で変更したい場合は，
+`global` をつかってその変数を指定できる．
+
+（ただし，プログラムの理解が難しくなるので，グローバル変数は
+使わないですむなら，使わない方がよい．）
+
+関数の外の変数を読むことは，何もしなくでもできる．
+
+.globallocal3.py
+[source,python]
+----
+def f():
+    b = a
+    print(a, b)
+
+a = 10
+print(a)
+f()
+print(a)
+----
+
+
+== リスト (list)
+
+データの列を保存したデータ．
+オフセット (offset)を指定して，列（リスト）の要素を指定してアクセスできる．
+（注．Python以外では，オフセットではなく，添え字(そえじ, index)と呼ぶことが多い．）
+
+
+[source,python]
+----
+>>> weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+>>> weekdays[0]
+'Monday'
+>>> weekdays[4]
+'Friday'
+>>> weekdays[-1]
+'Friday'
+>>> weekdays[-5]
+'Monday'
+----
+
+`リスト名.append()` で，リストの最後に要素を追加できる．
+`リスト名.extend()` で，別のリストを後ろに追加できる．
+
+
+[source,python]
+----
+>>> weekend = ['Saturday']
+>>> weekend.append('Sunday')
+>>> weekend
+['Saturday', 'Sunday']
+>>> weekdays.extend(weekend)
+>>> weekdays
+['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+----
+その他，要素がリストにあるかどうかの判定，リスト途中への要素の追加や，削除など，いろいろな機能が存在．
+必要になったら調べてみよう．
+
+`len` で，リストの長さを取得．
+[source,python]
+----
+>>> len(weekdays)
+7
+----
+
+`for` をつかうと，リストのそれぞれの要素に対して，処理を実行することができる．
+[source,python]
+----
+>>> for day in weekdays:
+	print(day)
+
+Monday
+Tuesday
+Wednesday
+Thursday
+Friday
+Saturday
+Sunday
+----
+
+要素の中身を変更することも可能．
+[source,python]
+----
+>>> weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+>>> weekdays[4] = "Fri"
+>>> print(weekdays)
+['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Fri', 'Saturday', 'Sunday']
+----
+
+== Hangman つづき
+=== 前回のプログラムの原型全体
+
+関数 `get_word()` の `WORD` は，単語のリストになっている．
+(`split()` で，文字列を単語に分割して，リストにしている．)
+
+////
+.hangman.py
+[source,python]
+----
+include::sources/hangman.py[lines=1..]
+----
+////
+
+.hangman.py
+[source,python]
+----
+# hangman
+import random
+
+
+def get_word():
+    WORDS = "turaco shoebill tropicbird eagle crane peafowl dove \
+            hummingbird puffin cassowary lorikeet flamingo penguin \
+            heron booby owl toucan".split()
+    index = random.randint(0, len(WORDS)-1)
+    return WORDS[index]
+
+
+def unmask_word(word, letters):
+    st = ""
+    for c in word:
+        tmp = "_"
+        for ltr in letters:
+            if c == ltr:
+                tmp = c
+        st = st + tmp
+    return st
+
+
+def is_correct(secretword, letters):
+    for c in secretword:
+        is_covered = False
+        for ltr in letters:
+            if c == ltr:
+                is_covered = True
+        if not is_covered:
+            return False
+    return True
+
+
+def input_letter():
+    while True:
+        print("英文字を1字入力")
+        st = input()
+        if len(st) == 1 and st in 'abcdefghijklmnopqrstuvwxyz':
+            return st
+
+
+life = 6  # <1>
+letters = ""
+secret = get_word()
+st = unmask_word(secret, letters)
+print("life:", life)
+print(st)
+while not is_correct(secret, letters):
+    letters = letters + input_letter()
+    st_next = unmask_word(secret, letters)  # <2>
+    print(st_next)
+    if st == st_next:  # <3>
+        life = life - 1
+        print("life:", life)
+        if life <= 0:
+            break  # <4>
+    st = st_next
+----
+<1> ライフを導入
+<2> 1字入力する前の状況と，今の状況を区別するため`st_next` を導入
+<3> 前の状況と変化がないなら，ライフを減らして表示する処理を実行
+<4> ライフがないなら `break` して，`while` ループを抜ける
+<5> 今から次の1字を入力するので，前の状況を，現在の状況とする
+
+=== 課題
+Hangmanを完成させよう．
+
+
+. 最後に正解を出力する
+. 答となる単語を追加したり，変更したりする（もしできれば）
+. ライフの代わりに絵を出力（もしできれば）
+
+参考
+
+.asciiart1.py
+[source,python]
+----
+PIC0 = """
++---+
+|   |
+    |
+    |
+    |
+    |
+=========
+"""
+
+PIC1 = """
++---+
+|   |
+O   |
+/|\\ |
+/ \\ |
+    |
+=========
+"""
+
+PICS = [PIC0, PIC1]
+print(PICS[0])
+print(PICS[1])
+----
+
+注. `\` は特殊な文字なので，通常の文字として扱うために `\\` と書く必要がある． 
+
+== Pyxel
+
+次回以降，
+https://github.com/kitao/pyxel/blob/main/docs/README.ja.md[pyxel]をつかって，
+プログラムを作っていく予定．
+
+
+=== インストール方法
+
+==== Windows
+コマンドライン（または，ターミナル）を開いて，以下を実行する．
+
+----
+pip install pyxel
+----
+
+==== Mac
+ターミナルを開いて，以下を実行する．
+
+----
+pip install pyxel
+----
+
+
+インストールして，確認のため，以下のサンプルを動かしてみよう．
+(Pyxelのウェブページに他のサンプルも多数あり．)
+////
+.pyxel_test.py
+[source,python]
+----
+include::sources/pyxel_test.py[lines=1..]
+----
+////
+
+.pyxel_test.py
+[source,python]
+----
+import pyxel
+
+pyxel.init(256, 256)
+
+
+def update():
+    pass
+
+
+def draw():
+    pyxel.cls(0)
+    pyxel.rect(10, 10, 20, 20, 12)
+
+
+pyxel.run(update, draw)
+----
+
+
+Escキーを押すと，終了する．
+
+=== VSCodeのインストール
+
+IDLEだとPyxelが使いにくいので，VSCodeをインストールするのがおすすめ．
