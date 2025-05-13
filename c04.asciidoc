@@ -290,16 +290,15 @@ https://github.com/kitao/pyxel/blob/main/docs/README.ja.md[pyxel]をつかって
 コマンドライン（または，ターミナル）を開いて，以下を実行する．
 
 ----
-pip install pyxel
+pip install -U pyxel
 ----
 
 ==== Mac
 ターミナルを開いて，以下を実行する．
 
 ----
-pip install pyxel
+pip3 install -U pyxel
 ----
-
 
 インストールして，確認のため，以下のサンプルを動かしてみよう．
 (Pyxelのウェブページに他のサンプルも多数あり．)
@@ -334,6 +333,17 @@ pyxel.run(update, draw)
 
 Escキーを押すと，終了する．
 
-=== VSCodeのインストール
+時間があれば，Pyxelのサンプルをいじってみるとよい．
 
-IDLEだとPyxelが使いにくいので，VSCodeをインストールするのがおすすめ．
+== VSCode
+VSCodeは，エディタといって，テキストファイル（文字だけのファイル）を編集するツール
+IDLEだとpyxelが使いにくいので，プログラムを開発するのに，VSCodeを使うのがおすすめ．
+
+=== インストール方法
+==== Windows
+公式ページ[https://code.visualstudio.com/]から，インストーラーをダウンロードして，実行．
+
+==== Mac
+公式ページからZipファイルをダウンロードして，解凍．
+解凍したファイルを，アプリケーションフォルダに移動．
+
