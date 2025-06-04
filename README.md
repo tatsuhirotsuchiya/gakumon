@@ -14,6 +14,10 @@
 
 ### [6回: 5/28](c06.asciidoc)
 
+### [7回: 6/04](c07.asciidoc)
+
+### [ターミナルの使い方](appendix1.asciidoc)
+
 <!-- 2024
 ### [1回: 4/10](c01.asciidoc)
 
