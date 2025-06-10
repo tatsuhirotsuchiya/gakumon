@@ -18,6 +18,8 @@
 
 ### [MacでのPyxelの使い方](appendix1.asciidoc)
 
+### [8回: 6/11](c08.asciidoc)
+
 <!-- 2024
 ### [1回: 4/10](c01.asciidoc)
 
