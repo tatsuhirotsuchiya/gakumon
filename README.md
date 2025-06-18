@@ -16,7 +16,7 @@
 
 ### [7回: 6/04](c07.asciidoc)
 
-### [MacでのPyxelの使い方](appendix1.asciidoc)
+### [ターミナルの使い方](appendix1.asciidoc)
 
 ### [8回: 6/11](c08.asciidoc)
 

@@ -18,8 +18,8 @@
 - classes.py
 - shooting1.py (あとで，shooting2.py，shooting3.pyと拡張していく)
 
-`shooting1.py` が本体なので，
-ターミナルから実行するときは，`pyxel run shooting1.py` とする．
+`shooting1.py` が本体なので，プログラムを実行するときは，
+読み込んでいる `classes.py` ではなくて，このプログラムを動かす．
 
 今回は，pyxel editor は使わないで，プログラムの中でグラフィックスとサウンドを定義した．
 プログラム内で定義しなくても，データファイルをつくって， `pyxel.load("ファイルの名前")` として，
