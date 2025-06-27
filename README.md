@@ -18,6 +18,14 @@
 
 ### [ターミナルの使い方](appendix1.asciidoc)
 
+### [8回: 6/11](c08.asciidoc)
+
+### [9回: 6/18](c09.asciidoc)
+
+### [10回：6/25](c10.asciidoc)
+
+### [11回：7/02](c11.asciidoc)
+
 <!-- 2024
 ### [1回: 4/10](c01.asciidoc)
 
