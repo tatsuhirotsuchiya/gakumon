@@ -1,0 +1,39 @@
+MODULE main
+
+VAR
+  a : {0, 1, 2};
+  b : {0, 1, 2};
+  s : {on, off};
+
+ASSIGN
+  init(a) := 0;
+  init(b) := 0;
+  init(s) := off;
+
+  next(a) := case
+    b = 1 : a;
+    a = 0 : 1;
+    a = 1 : 2;
+    a = 2 : 0;
+    TRUE: a;
+  esac;
+
+  next(b) := case
+    a = b : b;
+    b = 0 : 1;
+    b = 1 : 2;
+    b = 2 : 0;
+    TRUE: b;
+  esac;
+
+  next(s) := case
+    a = 2 & b = 2 : on;
+    a = 1 & b = 1 : off;
+    TRUE: s;
+  esac;
+
+LTLSPEC
+  G(s = off -> F (s = on))
+
+LTLSPEC
+  G(s = on -> F (s = off))

@@ -1,0 +1,93 @@
+MODULE main
+VAR
+  R0: 0..3;  -- ウサギ 岸0
+  W0: 0..3;  -- オオカミ 岸0
+  R1: 0..3;  -- ウサギ 岸1
+  W1: 0..3;  -- オオカミ 岸1
+  RB: 0..2;  -- ウサギ ボート
+  WB: 0..2;  -- オオカミ ボート
+  RC: 0..2;  -- ウサギ 岸からボート
+  WC: 0..2;  -- オオカミ 岸からボート
+  boat : {0, 1, m01, m10}; -- ボートの位置: 岸0, 岸1, 移動中0->1，移動中1->0 
+
+ASSIGN
+  init(R0) := 3;
+  init(W0) := 3;
+  init(R1) := 0;
+  init(W1) := 0;
+  init(RB) := 0;
+  init(WB) := 0; 
+  init(RC) := {0, 1, 2};
+  init(WC) := {0, 1, 2};
+  init(boat) := 0;
+
+  next(boat) := case
+    boat = 0: m01;
+    boat = m01: 1;
+    boat = 1: m10;
+    boat = m10: 0;
+  esac;
+
+  next(R0) := case
+    boat = 0 & R0 - RC >= 0 : R0 - RC;  -- ボートに岸0からのる
+    boat = m10 & R0 + RB <= 3: R0 + RB; -- ボートから岸0に移る
+    TRUE: R0;
+  esac;
+
+  next(W0) := case
+    boat = 0 & W0 - WC >= 0 : W0 - WC;  -- ボートに岸0からのる
+    boat = m10 & W0 + WB <= 3: W0 + WB; -- ボートから岸0に移る
+    TRUE: W0;
+  esac;
+
+  next(R1) := case
+    boat = 1 & R1 - RC >= 0 : R1 - RC;  -- ボートに岸1からのる
+    boat = m01 & R1 + RB <= 3: R1 + RB; -- ボートから岸1に移る
+    TRUE: R1;
+  esac;
+
+  next(W1) := case
+    boat = 1 & W1 - WC >= 0 : W1 - WC;  -- ボートに岸1からのる
+    boat = m01 & W1 + WB <= 3: W1 + WB; -- ボートから岸1に移る
+    TRUE: W1;
+  esac;
+
+  next(RB) := case
+    boat = 0 : RC;  -- ボートに岸0からのる
+    boat = m10 : 0; -- ボートから岸0に移る
+    boat = 1 : RC;  -- ボートに岸1からのる
+    boat = m01: 0; -- ボートから岸1に移る
+   TRUE: RB;
+  esac;
+
+  next(WB) := case
+    boat = 0 : WC;  -- ボートに岸0からのる
+    boat = m10 : 0; -- ボートから岸0に移る
+    boat = 1 : WC;  -- ボートに岸1からのる
+    boat = m01: 0; -- ボートから岸1に移る
+    TRUE: WB;
+  esac;
+
+  next(RC) := {0, 1, 2};
+  next(WC) := {0, 1, 2};
+
+DEFINE
+  goal := R1 = 3 & W1 = 3;
+  safe := ((R0 >= W0) | (R0 = 0)) & ((R1 >= W1) | (R1 = 0)) & ((RB >= WB) | (RB = 0));
+  crew := (boat = m01 | boat = m10) -> ((RB + WB = 1) | (RB + WB = 2));
+  ok0 :=  boat = 0 -> ((R0 >= RC) & (W0 >= WC));
+  ok1 :=  boat = 1 -> ((R1 >= RC) & (W1 >= WC));
+  rule := safe & crew & ok0 & ok1;
+
+-- LTLSPEC
+--   !(rule U goal) -- 「ruleが満たされ続けて，やがてgoalが成り立つ」ということが，ない
+
+-- LTLSPEC
+--   !(G (rule) -> F goal)
+
+INVAR
+  rule
+-- LTLSPEC
+--  ! goal
+
+   

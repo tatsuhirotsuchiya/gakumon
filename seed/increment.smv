@@ -1,0 +1,51 @@
+MODULE main
+VAR
+  x : 0..20;
+  go0 : boolean;
+  go1 : boolean;
+  cp0 : 0..2;  -- 偶数read, 奇数write
+  cp1 : 0..2;
+  tmp0: 0..20;
+  tmp1: 0..20;
+
+INVAR
+  !(go0 & go1)  -- go0とgo1は同時にTRUEにならない
+
+ASSIGN
+  init(x) := 0;
+  init(cp0) := 0;
+  init(cp1) := 0;
+  
+  next(tmp0) := case
+    go0 & cp0 mod 2 = 0 & cp0 < 2: x;  -- read
+    TRUE: tmp0;
+  esac;
+
+  next(tmp1) := case
+    go1 & cp1 mod 2 = 0 & cp1 < 2: x;  -- read
+    TRUE: tmp1;
+  esac;
+    
+  next(x) := case
+    go0 & cp0 mod 2 = 1 & tmp0 < 2: tmp0 + 1;  -- 0がwrite
+    go1 & cp1 mod 2 = 1 & tmp1 < 2: tmp1 + 1;  -- 1がwrite
+    TRUE: x;
+  esac;
+
+  next(cp0) := case
+    go0 & cp0 < 2 : cp0 + 1;  -- 1行すすむ
+    TRUE: cp0;
+  esac;
+
+  next(cp1) := case
+    go1 & cp1 < 2 : cp1 + 1;  -- 1行すすむ
+    TRUE: cp1;
+  esac;
+
+FAIRNESS
+  go0;
+FAIRNESS
+  go1;
+LTLSPEC
+  G (cp0 = 2 & cp1 = 2 -> x = 2)
+
