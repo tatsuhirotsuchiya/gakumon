@@ -1,0 +1,125 @@
+MODULE main
+VAR
+  Ra : 0..3;
+  Rb : 0..3;
+  Wa : 0..3;
+  Wb : 0..3;
+  boat : {a, b}; -- ボートの位置
+  phase : {s, t};
+  onR : 0..3;
+  onW : 0..3;
+
+ASSIGN
+  init(Ra) := 3;
+  init(Rb) := 0;
+  init(Wa) := 3;
+  init(Wb) := 0;
+  init(boat) := a;
+  init(phase) := s;
+  init(onR) := 0;
+  init(onW) := 0;
+
+  next(Ra) := case
+    phase = s & boat = a & Ra = 3 : onR = 0..3;
+    phase = s & boat = a & Ra = 2 : onR = 0..2;
+    phase = s & boat = a & Ra = 1 : onR = 0..1;
+    phase = s & boat = a & Ra = 1 : onR = 0;
+    phase = s & boat = b & Rb = 3 : onR = 0..3;
+    phase = s & boat = b & Rb = 2 : onR = 0..2;
+    phase = s & boat = b & Rb = 1 : onR = 0..1;
+    phase = s & boat = b & Rb = 1 : onR = 0;
+    phase = t & boat = a : Ra : onR = 0..3;
+    phase = t & boat = a : Ra = 2 : onR = 0..2;
+    phase = t & boat = a : Ra = 1 : onR = 0..1;
+    phase = t & boat = a : Ra = 1 : onR = 0;
+    phase = t & boat = b : Rb = 3 : onR = 0..3;
+    phase = t & boat = b : Rb = 2 : onR = 0..2;
+    phase = t & boat = b : Rb = 1 : onR = 0..1;
+    phase = t & boat = b : Rb = 1 : onR = 0;
+
+
+  next(onR) := case
+    phase = 0 & boat = 
+
+
+  next(boat) := case
+    boad = a & next(Ra) - next(Rb) : to;
+    Boat = to & ON_BOARD : from; 
+    !ON_BOARD : Boat;
+  esac;
+
+  next(R0) := case
+    R0 = from & !ON_BOARD : {from, boat};
+    R0 = from & ON_BOARD : to;
+    R0 = boat & next(Boat) = to : to;
+    R0 = boat & next(Boat) = from : from;
+    R0 = to & !ON_BOARD : {to, boat};
+    R0 = to & ON_BOARD : from;
+  esac;
+
+  next(R1) := case
+    R1 = from & !ON_BOARD : {from, boat};
+    R1 = from & ON_BOARD : to;
+    R1 = boat & next(Boat) = to : to;
+    R1 = boat & next(Boat) = from : from;
+    R1 = to & !ON_BOARD : {to, boat};
+    R1 = to & ON_BOARD : from;
+  esac;
+
+  next(R2) := case
+    R2 = from & !ON_BOARD : {from, boat};
+    R2 = from & ON_BOARD : to;
+    R2 = boat & next(Boat) = to : to;
+    R2 = boat & next(Boat) = from : from;
+    R2 = to & !ON_BOARD : {to, boat};
+    R2 = to & ON_BOARD : from;
+  esac;
+
+  next(W0) := case
+    W0 = from & !ON_BOARD : {from, boat};
+    W0 = from & ON_BOARD : to;
+    W0 = boat & next(Boat) = to : to;
+    W0 = boat & next(Boat) = from : from;
+    W0 = to & !ON_BOARD : {to, boat};
+    W0 = to & ON_BOARD : from;
+  esac;
+
+  next(W1) := case
+    W1 = from & !ON_BOARD : {from, boat};
+    W1 = from & ON_BOARD : to;
+    W1 = boat & next(Boat) = to : to;
+    W1 = boat & next(Boat) = from : from;
+    W1 = to & !ON_BOARD : {to, boat};
+    W1 = to & ON_BOARD : from;
+  esac;
+
+
+  next(W2) := case
+    W2 = from & !ON_BOARD : {from, boat};
+    W2 = from & ON_BOARD : to;
+    W2 = boat & next(Boat) = to : to;
+    W2 = boat & next(Boat) = from : from;
+    W2 = to & !ON_BOARD : {to, boat};
+    W2 = to & ON_BOARD : from;
+  esac;
+
+DEFINE
+  goal := R0 = to & R1 = to & R2 = to & W0 = to & W1 = to & W2 = to;
+--  safe := ((R0 >= W0) | (R0 = 0)) & ((R1 >= W1) | (R1 = 0)) & ((RB >= WB) | (RB = 0));
+--  crew := (boat = m01 | boat = m10) -> ((RB + WB = 1) | (RB + WB = 2));
+--  ok0 :=  boat = 0 -> ((R0 >= RC) & (W0 >= WC));
+--  ok1 :=  boat = 1 -> ((R1 >= RC) & (W1 >= WC));
+--  rule := safe & crew & ok0 & ok1;
+
+-- LTLSPEC
+--   !(rule U goal) -- 「ruleが満たされ続けて，やがてgoalが成り立つ」ということが，ない
+
+-- LTLSPEC
+--   !(G (rule) -> F goal)
+
+-- INVAR
+--   rule
+LTLSPEC
+   F goal
+
+   
